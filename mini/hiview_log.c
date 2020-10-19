@@ -74,8 +74,8 @@ boolean HiLogRegisterModule(uint16 id, const char *name)
         return FALSE;
     }
 
-    uint32 len = (uint32)strnlen(name, LOG_MODULE_NAME_LEN + 1);
-    if (len >= LOG_MODULE_NAME_LEN) {
+    uint32 len = (uint32)strnlen(name, LOG_MODULE_NAME_LEN);
+    if (len >= LOG_MODULE_NAME_LEN - 1) {
         return FALSE;
     }
     uint32 i = 0;
