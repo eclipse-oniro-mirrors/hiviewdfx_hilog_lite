@@ -79,7 +79,7 @@ boolean HiLogRegisterModule(uint16 id, const char *name)
         return FALSE;
     }
     uint32 i = 0;
-    while (name[i] != 0 && i < len) {
+    while (i < len && name[i] != 0) {
         if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z'))) {
             return FALSE;
         }
