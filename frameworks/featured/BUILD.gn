@@ -21,8 +21,8 @@ hilog_sources = [
 
 config("hilog_config") {
     include_dirs = [
-        "//base/hiviewdfx/interfaces/innerkits/hilog",
-        "//base/hiviewdfx/interfaces/innerkits",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
     ]
 }
@@ -53,7 +53,7 @@ ndk_lib("hilog_ndk") {
         ":hilog_shared"
     ]
     head_files = [
-        "//base/hiviewdfx/interfaces/kits/hilog",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog",
         "//third_party/bounds_checking_function/include",
     ]
 }
