@@ -294,9 +294,10 @@ Parameter description
 
 ## Repositories Involved<a name="s999c697ebde345449386ce8dc1df1db0"></a>
 
-hievent\_lite
+[DFX subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/dfx.md)
 
-hilog\_lite
+**hiviwdfx\_hilog\_lite**
 
-hiview\_lite
+[hiviwdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README.md)
 
+[hiviwdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README.md)
