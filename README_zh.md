@@ -248,9 +248,10 @@ HILOG_FATAL(type, ...)
 
 ## 涉及仓<a name="s999c697ebde345449386ce8dc1df1db0"></a>
 
-hievent\_lite
+[DFX子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/DFX%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-hilog\_lite
+**hiviwdfx\_hilog\_lite**
 
-hiview\_lite
+[hiviwdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README_zh.md)
 
+[hiviwdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README_zh.md)
