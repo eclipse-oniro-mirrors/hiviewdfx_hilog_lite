@@ -48,7 +48,8 @@ static void HiLogInit(void)
         HiLogRegisterModule(HILOG_MODULE_MEDIA, "MEDIA") == FALSE ||
         HiLogRegisterModule(HILOG_MODULE_DMS, "DMS") == FALSE ||
         HiLogRegisterModule(HILOG_MODULE_SEN, "SEN") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_SCY, "SCY") == FALSE) {
+        HiLogRegisterModule(HILOG_MODULE_SCY, "SCY") == FALSE ||
+        HiLogRegisterModule(HILOG_MODULE_SOFTBUS, "SOFTBUS") == FALSE) {
         return;
     }
 
