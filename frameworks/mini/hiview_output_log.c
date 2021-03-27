@@ -183,6 +183,10 @@ static void OutputLog2TextFile(const Request *req)
             continue;
         }
         len = LogContentFmt(tempOutStr, sizeof(tempOutStr), (uint8 *)&logContent);
+        if (len > 0 && tempOutStr[len - 1] == '\0') {
+            // prevent writing '\0' character to file
+            len--;
+        }
         if (len > 0 && WriteToFile(&g_logFile, (uint8 *)tempOutStr, len) != len) {
             g_hiviewConfig.writeFailureCount++;
         }
