@@ -12,6 +12,9 @@
 # limitations under the License.
 
 import("//build/lite/config/component/lite_component.gni")
+declare_args() {
+    ohos_hiviewdfx_hilog_file_size = 2048
+}
 
 static_library("apphilogcat_static") {
     sources = [
@@ -24,6 +27,7 @@ static_library("apphilogcat_static") {
     deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
     ]
+    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
 }
 
 lite_component("apphilogcat") {
