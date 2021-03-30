@@ -27,7 +27,6 @@
 
 
 #define HILOG_LOGBUFFER 2048
-#define HILOG_MAX_FILELEN 2048
 #define HILOG_PATH1 "/storage/data/log/hilog1.txt"
 #define HILOG_PATH2 "/storage/data/log/hilog2.txt"
 
