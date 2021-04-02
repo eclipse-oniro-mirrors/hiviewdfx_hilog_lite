@@ -11,13 +11,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-static_library("hilog_lite_command") {
+import("//build/lite/config/component/lite_component.gni")
+
+config("hilog_command_config"){
+    include_dirs = [
+        "//base/hiviewdfx/hilog_lite/command"
+    ]
+}
+
+lite_library("hilog_command_static") {
+    target_type = "static_library"
     sources = [
-        "hilog_lite_command.c",
+        "hilog_command.c",
     ]
     cflags = [ "-Wall" ]
-    include_dirs = [
-        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
-        "//base/hiviewdfx/hiview_lite",
+    public_configs = [
+        ":hilog_command_config",
+        "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config"
+    ]
+    deps = [
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
+    ]
+}
+
+lite_library("hilog_command_shared") {
+    target_type = "shared_library"
+    sources = [
+        "hilog_command.c",
+    ]
+    cflags = [ "-Wall" ]
+    public_configs = [
+        ":hilog_command_config",
+        "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config"
+    ]
+    deps = [
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
     ]
 }

@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
@@ -23,12 +24,16 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "log.h"
 
+#include "hilog_command.h"
+#include "log.h"
 
 #define HILOG_LOGBUFFER 2048
 #define HILOG_PATH1 "/storage/data/log/hilog1.txt"
 #define HILOG_PATH2 "/storage/data/log/hilog2.txt"
+
+#undef LOG_TAG
+#define LOG_TAG "apphilogcat"
 
 static int FileSize(const char *filename)
 {
@@ -94,15 +99,15 @@ int main(int argc, const char **argv)
     int fd;
     int ret;
     FILE *fpWrite = NULL;
-    if (argc == 1) {
-#ifdef OHOS_RELEASE
-        return 0;
-#endif
+    bool printFlag = true;
+
+    if (argc > 1) {
+        ret = HilogCmdProc(LOG_TAG, argc, argv);
+        if (ret == 0) {
+            return 0;
+        }
     }
-    if (argc == HILOG_TEST_ARGC) {
-        HILOG_ERROR(LOG_CORE, "TEST = %d,%s,%d\n", argc, "hilog test", argc);
-        return 0;
-    }
+
     fd = open(HILOG_DRIVER, O_RDONLY);
     if (fd < 0) {
         printf("hilog fd failed fd=%d\n", fd);
@@ -143,6 +148,17 @@ int main(int argc, const char **argv)
         rawtime = (time_t)sec;
         /* Get GMT time */
         info = gmtime(&rawtime);
+
+        printFlag = FilterLevelLog(g_hiviewConfig.level, *(head->msg));
+        if (!printFlag) {
+            continue;
+        }
+#define MODULE_OFFSET 2
+        printFlag = FilterModuleLog(g_hiviewConfig.logOutputModule, (head->msg) + MODULE_OFFSET);
+        if (!printFlag) {
+            continue;
+        }
+
         if (info == NULL) {
             continue;
         }
