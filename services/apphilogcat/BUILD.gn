@@ -14,6 +14,32 @@
 import("//build/lite/config/component/lite_component.gni")
 declare_args() {
     ohos_hiviewdfx_hilog_file_size = 2048
+    enable_ohos_hiviewdfx_apphilogcat_init_release = true
+    enable_ohos_hiviewdfx_apphilogcat_init_debug = true
+    ohos_hiviewdfx_apphilogcat_log_level_release = 5
+    ohos_hiviewdfx_apphilogcat_log_level_debug = 3
+    apphilogcat_on = 1
+    apphilogcat_off = 0
+}
+
+config("apphilogcat_config"){
+    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
+
+    if(enable_ohos_hiviewdfx_apphilogcat_init_release){
+        defines += ["APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on"]
+    }else{
+        defines += ["APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off"]
+    }
+
+    if(enable_ohos_hiviewdfx_apphilogcat_init_debug){
+        defines += ["APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on"]
+    }else{
+        defines += ["APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off"]
+    }
+
+    defines += ["CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release"]
+
+    defines += ["CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug"]
 }
 
 static_library("apphilogcat_static") {
@@ -25,9 +51,10 @@ static_library("apphilogcat_static") {
         "//third_party/bounds_checking_function/include",
     ]
     deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//base/hiviewdfx/hilog_lite/command:hilog_command_static"
     ]
-    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
+    public_configs = [":apphilogcat_config"]
 }
 
 lite_component("apphilogcat") {
