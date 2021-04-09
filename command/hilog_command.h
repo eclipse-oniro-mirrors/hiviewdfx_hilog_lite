@@ -26,27 +26,7 @@ extern "C" {
 #endif
 #endif /* End of #ifdef __cplusplus */
 
-#define CMD_MIN_LEN 2
-#define CMD_MAX_LEN 32
-#define CMD_HILOGCAT "hilog"
-#define CMD_HIEVENT "hievent"
-#define OPTION_TAG '-'
-#define OPTION_LIST 'l'
-#define OPTION_SET 'C'
-#define OPTION_SIMULATE 's'
-#define OPTION_HELP 'h'
-#define OPTION_2_FILE 'f'
-#define OPTION_START 't'
-#define OPTION_UART 'R'
-
-#define PARA_LEVEL "level"
-#define PARA_LEVEL_LEN 5
-#define PARA_MODULE "mod"
-#define PARA_MODULE_LEN 3
-#define PARA_AUTO "auto"
-#define PARA_AUTO_LEN 4
-#define OP_ASSIGN '='
-#define STR_MAX_LEN 128
+#define DOMAIN_ID_LENGTH 6
 
 typedef struct {
     const unsigned char outputOption : 4; /* Control log output mode. Cannot be modified during running. */
@@ -55,7 +35,7 @@ typedef struct {
     unsigned char logSwitch : 1;          /* Indicates whether to enable the log component. */
     unsigned char eventSwitch : 1;        /* Indicates whether to enable the event component. */
     unsigned char dumpSwitch : 1;         /* Indicates whether to enable the dump component. */
-    unsigned char logOutputModule;        /* Control log output module. */
+    unsigned char logOutputModule[DOMAIN_ID_LENGTH];        /* Control log output module. */
     unsigned short writeFailureCount;
 } HiviewConfig;
 
@@ -67,18 +47,11 @@ typedef enum {
     OUTPUT_OPTION_MAX
 } HiviewOutputOption;
 
-#define HIVIEW_FEATURE_ON 1
-#define HIVIEW_FEATURE_OFF 0
-#define HILOG_MODULE_ALL 0xff
-
-#define HILOG_MODULE_MAX_NUM 50
-#define DOMIAN_ID_LENTH 6
-
 extern HiviewConfig g_hiviewConfig;
 
 int HilogCmdProc(const char* tag, int argc, const char **argv);
 bool FilterLevelLog(unsigned char setLevel, unsigned char logLevel);
-bool FilterModuleLog(unsigned char setModule, const char *logModule);
+bool FilterModuleLog(unsigned char* setModule, const char *logModule);
 
 #ifdef __cplusplus
 #if __cplusplus
