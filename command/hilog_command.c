@@ -22,7 +22,35 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#define OPTION_TAG '-'
+#define OPTION_LIST 'l'
+#define OPTION_SET 'C'
+#define OPTION_HELP 'h'
+
+#define PARA_LEVEL "level"
+#define PARA_LEVEL_LEN 5
+#define PARA_MODULE "mod"
+#define PARA_MODULE_LEN 3
+#define PARA_AUTO "auto"
+#define PARA_AUTO_LEN 4
+
 #define APPHILOGCAT_OFF 0
+
+#define HIVIEW_FEATURE_ON 1
+#define HIVIEW_FEATURE_OFF 0
+
+#define ARG2 1
+#define ARG3 2
+#define ARG4 3
+#define ARG5 4
+#define ARG6 5
+
+#define NUMBER_ARG_2 2
+#define NUMBER_ARG_3 3
+#define NUMBER_ARG_4 4
+#define NUMBER_ARG_6 6
+
+#define HILOG_MODULE_MAX "FFFFF"
 
 char g_logLevelInfo[HILOG_LEVEL_MAX] = {
     'N', // "NONE"
@@ -35,42 +63,26 @@ char g_logLevelInfo[HILOG_LEVEL_MAX] = {
     'F'  // "FATAL"
 };
 
-char g_logModuleInfo[HILOG_MODULE_MAX_NUM][DOMIAN_ID_LENTH] = {
-    "00000",
-    "01100", // "NONE"
-    "01200", // "NONE"
-    "01300", // "NONE"
-    "01400", // "NONE"
-    "01500", // "NONE"
-    "01600", // "NONE"
-    "01700", // "NONE"
-    "01800", // "NONE"
-    "01900", // "NONE"
-    "02500", // "NONE"
-    "02600", // "NONE"
-    "02D00", // "NONE"
-};
-
 HiviewConfig g_hiviewConfig = {
     .outputOption = OUTPUT_OPTION_FLOW,
     .level = LOG_DEBUG,
     .logSwitch = HIVIEW_FEATURE_ON,
     .dumpSwitch = HIVIEW_FEATURE_OFF,
     .eventSwitch = HIVIEW_FEATURE_OFF,
+    .logOutputModule = HILOG_MODULE_MAX,
 };
 
 void HilogHelpProc(const char* tag)
 {
     printf("%s [-h] [-l level/mod] [-C level <1>] [-C mod <3>]\n", tag);
-    printf(" -h            Help\n");
-    printf(" -l            Query the level and module definition information\n");
-    printf(" -l level      Query the level definition information\n");
-    printf(" -l mod        Query the level definition information\n");
-    printf(" -C            Enable all level logs of all modules\n");
-    printf(" -C level <id> Set the lowest log level\n");
-    printf(" -C mod <id>   Enable the logs of a specified module and disable other modules\n");
-    printf(" -C auto       Set log level with predefined macro\n");
-    printf(" -f <filename> Enable the logs to a specified file\n");
+    printf(" -h                         Help\n");
+    printf(" -l                         Query the level definition information\n");
+    printf(" -C                         Enable all level logs of all modules\n");
+    printf(" -C auto                    Set log level with predefined macro\n");
+    printf(" -C level <id>              Set the lowest log level\n");
+    printf(" -C mod <id>                Enable the logs of a specified module and disable other modules\n");
+    printf(" -C mod <mid> level <lid>   Set the lowest log level and enable specified module\n");
+    printf(" -C level <lid> mod <mid>   Set the lowest log level and enable specified module\n");
 }
 
 void ListLevelInfo(void)
@@ -83,32 +95,12 @@ void ListLevelInfo(void)
     printf(" 7 - FATAL\n");
 }
 
-void ListModuleInfo(void)
+void HilogListProc(int argc, const char **argv)
 {
-    int i, ret;
-    char modInfo[STR_MAX_LEN] = { '\0' };
-    printf("======Module Information======\n");
-    for (i = 0; i < HILOG_MODULE_MAX_NUM; i++) {
-        if (g_logModuleInfo[i][0] == 0) {
-            break;
-        }
-        ret = snprintf_s(modInfo, sizeof(modInfo), sizeof(modInfo) - 1, " %d - %s\n", i, g_logModuleInfo[i]);
-        if (ret > 0) {
-            modInfo[ret] = '\0';
-            printf((const char *)modInfo);
-        }
-    }
-}
-
-void HilogListProc(const char *cmd)
-{
-    if (cmd == NULL) {
+    if (argc == 2) {
         ListLevelInfo();
-        ListModuleInfo();
-    } else if (strncmp(cmd, PARA_LEVEL, PARA_LEVEL_LEN) == 0) {
-        ListLevelInfo();
-    } else if (strncmp(cmd, PARA_MODULE, PARA_MODULE_LEN) == 0) {
-        ListModuleInfo();
+    } else {
+        printf("Invalid command.\n");
     }
 }
 
@@ -116,21 +108,19 @@ bool SetLogLevel(unsigned char level)
 {
     if (level >= LOG_DEBUG && level < HILOG_LEVEL_MAX) {
         g_hiviewConfig.level = level;
+        printf("Set log level : %d \n", level);
         return true;
     }
     return false;
 }
 
-void SetLogOutputModule(unsigned char mod)
+void SetOutputModule(const char *mod)
 {
-    g_hiviewConfig.logOutputModule = mod;
-}
-
-void SetOutputModule(const char *cmd)
-{
-    char *endPtr = NULL;
-    int mod = strtol(cmd, &endPtr, 0);
-    SetLogOutputModule((unsigned char)mod);
+    if ((mod == NULL) || (strlen(mod) != (DOMAIN_ID_LENGTH - 1))) {
+        printf("Invalid command.\n");
+        return;
+    }
+    strncpy_s(g_hiviewConfig.logOutputModule, mod, DOMAIN_ID_LENGTH);
 }
 
 void SetOutputLevel(const char *cmd)
@@ -149,65 +139,93 @@ void SetOutputLevel(const char *cmd)
     printf("Set the log output level failure level=%d.\n", level);
 }
 
-int HilogSetProc(const char *option, const char *attr)
+int ProcAutoSet(void)
 {
-    if (option == NULL) {
-        SetLogLevel(LOG_DEBUG);
-        SetLogOutputModule(HILOG_MODULE_MAX_NUM);
-    } else if (strncmp(option, PARA_LEVEL, PARA_LEVEL_LEN) == 0) {
-        SetOutputLevel(attr);
-    } else if (strncmp(option, PARA_MODULE, PARA_MODULE_LEN) == 0) {
-        SetOutputModule(attr);
-    } else if (strncmp(option, PARA_AUTO, PARA_AUTO_LEN) == 0) {
 #ifdef OHOS_RELEASE
-    #if APPHILOGCAT_STATUS_RELEASE == APPHILOGCAT_OFF
-        printf("Applogcat Off \n");
-        return 0;
-    #else
-        SetLogLevel(CONFIG_LOG_LEVEL_RELEASE);
-        printf("Default log level: %d \n", CONFIG_LOG_LEVEL_RELEASE);
-    #endif
-#else  // OHOS_DEBUG
-    #if APPHILOGCAT_STATUS_DEBUG == APPHILOGCAT_OFF
-        printf("Applogcat Off \n");
-        return 0;
-    #else
-        SetLogLevel(CONFIG_LOG_LEVEL_DEBUG);
-        printf("Default log level: %d \n", CONFIG_LOG_LEVEL_DEBUG);
-    #endif
+#if APPHILOGCAT_STATUS_RELEASE == APPHILOGCAT_OFF
+    return 0;
+#else
+    SetLogLevel(CONFIG_LOG_LEVEL_RELEASE);
+    printf("Default log level: %d \n", CONFIG_LOG_LEVEL_RELEASE);
 #endif
-    }
-    printf("Applogcat On \n");
+#else  // OHOS_DEBUG
+#if APPHILOGCAT_STATUS_DEBUG == APPHILOGCAT_OFF
+    return 0;
+#else
+    SetLogLevel(CONFIG_LOG_LEVEL_DEBUG);
+    printf("Default log level: %d \n", CONFIG_LOG_LEVEL_DEBUG);
+#endif
+#endif
     return 1;
+}
+
+int HilogSetProc(int argc, const char **argv)
+{
+    switch (argc) {
+        case NUMBER_ARG_2: // XXhilogcat -C
+            SetLogLevel(LOG_DEBUG);
+            SetOutputModule(HILOG_MODULE_MAX);
+            return 1;
+        case NUMBER_ARG_3: // XXhilogcat -C auto
+            if (strncmp(&argv[ARG3][0], PARA_AUTO, PARA_AUTO_LEN) == 0) {
+                return ProcAutoSet();
+            }
+            break;
+        case NUMBER_ARG_6: // XXhilogcat -C mod <mid> level <lid> or XXhilogcat -C level <lid> mod <mid>
+            if (strncmp(&argv[ARG5][0], PARA_LEVEL, PARA_LEVEL_LEN) == 0) {
+                SetOutputLevel(&argv[ARG6][0]);
+            } else if (strncmp(&argv[ARG5][0], PARA_MODULE, PARA_MODULE_LEN) == 0) {
+                SetOutputModule(&argv[ARG6][0]);
+            } else {
+                printf("Invalid command.\n");
+                return 0;
+            }
+            // fall through
+        case NUMBER_ARG_4: // XXhilogcat -C level <id> or XXhilogcat -C mod <id>
+            if (strncmp(&argv[ARG3][0], PARA_LEVEL, PARA_LEVEL_LEN) == 0) {
+                SetOutputLevel(&argv[ARG4][0]);
+            } else if (strncmp(&argv[ARG3][0], PARA_MODULE, PARA_MODULE_LEN) == 0) {
+                SetOutputModule(&argv[ARG4][0]);
+            } else {
+                printf("Invalid command.\n");
+                return 0;
+            }
+            return 1;
+        default:
+            break;
+    }
+    printf("Invalid command.\n");
+    return 0;
 }
 
 int HilogCmdProc(const char* tag, int argc, const char **argv)
 {
-#define ARG2 1
-#define ARG3 2
-#define ARG4 3
+    if (argc <= 1) {
+        printf("Invalid command.\n");
+        return 0;
+    }
 
     int i = 0;
-
+    int ret = 0;
     if (argv[ARG2][i++] == OPTION_TAG) {
         switch (argv[ARG2][i++]) {
             case OPTION_HELP:
                 HilogHelpProc(tag);
-                return 0;
+                break;
             case OPTION_LIST:
-                HilogListProc(&argv[ARG3][0]);
-                return 0;
+                HilogListProc(argc, argv);
+                break;
             case OPTION_SET:
-                return HilogSetProc(&argv[ARG3][0], &argv[ARG4][0]);
-            case OPTION_2_FILE:
-                return 0;
+                ret = HilogSetProc(argc, argv);
+                break;
             default:
                 printf("Invalid command.\n");
-                return 0;
+                break;
         }
+    } else {
+        printf("Invalid command.\n");
     }
-    printf("Invalid command.\n");
-    return 0;
+    return ret;
 }
 
 bool FilterLevelLog(unsigned char setLevel, unsigned char logLevel)
@@ -226,15 +244,10 @@ bool FilterLevelLog(unsigned char setLevel, unsigned char logLevel)
     return false;
 }
 
-bool FilterModuleLog(unsigned char setModule, const char *logModule)
+bool FilterModuleLog(unsigned char *setModule, const char *logModule)
 {
-    if (setModule == HILOG_MODULE_MAX_NUM) {
+    if (strncmp(setModule, HILOG_MODULE_MAX, DOMAIN_ID_LENGTH) == 0) {
         return true;
     }
-    int ret = strncmp(logModule, g_logModuleInfo[setModule], DOMAIN_LENGTH);
-    // If module = setmodule, may print log
-    if (ret == 0) {
-        return true;
-    }
-    return false;
+    return strncmp(logModule, g_hiviewConfig.logOutputModule, DOMAIN_ID_LENGTH) == 0;
 }
