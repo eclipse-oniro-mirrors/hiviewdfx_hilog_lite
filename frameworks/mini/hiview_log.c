@@ -135,3 +135,36 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
 
     OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
+
+void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, ...)
+{
+    HiLogContent logContent = {0};
+    int32 argsNum = (nums - FUN_ARG_S);
+    if (argsNum < 0 || argsNum > LOG_MULTI_PARA_MAX) {
+        argsNum = 0;
+    }
+
+    if (g_hiviewConfig.logSwitch == HIVIEW_FEATURE_OFF || !CheckParameters(module, level) ||
+        LogIsLimited(module) || !LOG_IS_OUTPUT(module)) {
+        return;
+    }
+
+    HiLogCommon *pCommon = &(logContent.commonContent);
+    pCommon->head = LOG_INFO_HEAD;
+    pCommon->module = module;
+    pCommon->level = SET_HASH_FLAG(level);
+    pCommon->fmt = (const char*)hash;
+    pCommon->valueNumber = (uint8)argsNum;
+    pCommon->task = (uint8)HIVIEW_GetTaskId();
+    pCommon->time = (uint32)(HIVIEW_GetCurrentTime() / MS_PER_SECOND);
+
+    uint8 i = 0;
+    va_list args;
+    va_start(args, hash);
+    while (i < argsNum) {
+        logContent.values[i++] = va_arg(args, uint32);
+    }
+    va_end(args);
+
+    OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
+}

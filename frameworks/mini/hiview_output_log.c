@@ -56,6 +56,7 @@ static void OutputLog2BinFile(const Request *req);
 static int32 LogCommonFmt(char *outStr, int32 outStrlen, const HiLogCommon *commonContentPtr);
 static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr);
 static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr);
+static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr);
 
 void InitCoreLogOutput(void)
 {
@@ -262,8 +263,11 @@ int32 LogContentFmt(char *outStr, int32 outStrLen, const uint8 *pLogContent)
     HiLogContent *logContentPtr = (HiLogContent *)pLogContent;
 
     len = LogCommonFmt(outStr, outStrLen, &(logContentPtr->commonContent));
+    boolean isHash = CHECK_HASH_FLAG(logContentPtr->commonContent.level);
     if (len >= 0) {
-        if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
+        if (isHash) {
+            len += LogValuesFmtHash(outStr + len, outStrLen - len, logContentPtr);
+        } else if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
             len += LogDebugValuesFmt(outStr + len, outStrLen - len, logContentPtr);
         } else {
             len += LogValuesFmt(outStr + len, outStrLen - len, logContentPtr);
@@ -289,14 +293,16 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
 {
     int32 ret;
     uint32 time, day, hour, mte, sec;
+    uint8_t level;
 
     time = commonContentPtr->time;
     day = time / SECONDS_PER_DAY;
     hour = time % SECONDS_PER_DAY / SECONDS_PER_HOUR;
     mte = time % SECONDS_PER_HOUR / SECONDS_PER_MINUTE;
     sec = time % SECONDS_PER_MINUTE;
+    level = CLEAR_HASH_FLAG(commonContentPtr->level);
     ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d %02d:%02d:%02d 0 %d %c %d/%s: ",
-        day, hour, mte, sec, commonContentPtr->task, g_logLevelInfo[commonContentPtr->level],
+        day, hour, mte, sec, commonContentPtr->task, g_logLevelInfo[level],
         commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
 
     return ret;
@@ -396,4 +402,26 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
         ret = 0;
     }
     return ret;
+}
+
+static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)
+{
+    int32 outLen = 0;
+    uint32 paraNum = logContentPtr->commonContent.valueNumber;
+    int32 len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
+        "hash:%u para:", (uint32)logContentPtr->commonContent.fmt);
+    if (len < 0) {
+        return len;
+    }
+    outLen += len;
+
+    for (uint32 i = 0; i < paraNum && i < LOG_MULTI_PARA_MAX; i++) {
+        len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
+            "%u ", logContentPtr->values[i]);
+        if (len < 0) {
+            return len;
+        }
+        outLen += len;
+    }
+    return outLen;
 }
