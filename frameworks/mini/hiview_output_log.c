@@ -47,6 +47,12 @@ static HiviewFile g_logFile = {
     .fhandle = -1,
 };
 
+typedef struct LogFlushInfo LogFlushInfo;
+struct LogFlushInfo {
+    HiviewMutexId_t mutex;
+};
+static LogFlushInfo g_logFlushInfo;
+
 /* Output the log to UART using plaintext. */
 static void OutputLogRealtime(const Request *req);
 /* Output the log to FLASH using text. */
@@ -60,6 +66,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
 void InitCoreLogOutput(void)
 {
+    g_logFlushInfo.mutex = MUTEX_InitValue();
     InitHiviewStaticCache(&g_logCache, LOG_CACHE, g_logCacheBuffer, sizeof(g_logCacheBuffer));
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, OutputLog2TextFile);
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, OutputLog2BinFile);
@@ -137,6 +144,7 @@ void OutputLog(const uint8 *data, uint32 len)
 
 static void OutputLogRealtime(const Request *req)
 {
+    HIVIEW_MutexLock(g_logFlushInfo.mutex);
     HiLogContent logContent;
     char tempOutStr[LOG_FMT_MAX_LEN] = {0};
     int32 len;
@@ -159,15 +167,18 @@ static void OutputLogRealtime(const Request *req)
         }
         HIVIEW_UartPrint(tempOutStr);
     }
+    HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
 }
 
 static void OutputLog2TextFile(const Request *req)
 {
+    HIVIEW_MutexLock(g_logFlushInfo.mutex);
     HiLogContent logContent;
     char tempOutStr[LOG_FMT_MAX_LEN] = {0};
     (void)req;
 
     if (g_logCache.usedSize < sizeof(HiLogCommon)) {
+        HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
         return;
     }
 
@@ -192,10 +203,12 @@ static void OutputLog2TextFile(const Request *req)
             g_hiviewConfig.writeFailureCount++;
         }
     }
+    HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
 }
 
 static void OutputLog2BinFile(const Request *req)
 {
+    HIVIEW_MutexLock(g_logFlushInfo.mutex);
     HiLogCommon *pCommonContent = NULL;
     uint16 len = 0;
     uint16 valueLen;
@@ -204,10 +217,12 @@ static void OutputLog2BinFile(const Request *req)
     (void)req;
 
     if (outputSize < sizeof(HiLogCommon)) {
+        HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
         return;
     }
     tmpBuffer = (uint8 *)HIVIEW_MemAlloc(MEM_POOL_HIVIEW_ID, outputSize);
     if (tmpBuffer == NULL) {
+        HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
         return;
     }
     while (g_logCache.usedSize >= sizeof(HiLogCommon) && outputSize > (len + sizeof(HiLogCommon))) {
@@ -234,6 +249,7 @@ static void OutputLog2BinFile(const Request *req)
         HILOG_ERROR(HILOG_MODULE_HIVIEW, "Failed to write log data.");
     }
     HIVIEW_MemFree(MEM_POOL_HIVIEW_ID, tmpBuffer);
+    HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
 }
 
 uint32 GetLogFileSize(void)
@@ -424,4 +440,39 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
         outLen += len;
     }
     return outLen;
+}
+
+void FlushLog(boolean syncFlag)
+{
+    if (g_logCache.usedSize > 0) {
+        if (syncFlag == FALSE) {
+            switch (g_hiviewConfig.outputOption) {
+                case OUTPUT_OPTION_TEXT_FILE:
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
+                    break;
+                case OUTPUT_OPTION_BIN_FILE:
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
+                    break;
+                case OUTPUT_OPTION_FLOW:
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (g_hiviewConfig.outputOption) {
+                case OUTPUT_OPTION_TEXT_FILE:
+                    OutputLog2TextFile(NULL);
+                    break;
+                case OUTPUT_OPTION_BIN_FILE:
+                    OutputLog2BinFile(NULL);
+                    break;
+                case OUTPUT_OPTION_FLOW:
+                    OutputLogRealtime(NULL);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

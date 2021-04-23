@@ -168,3 +168,8 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
 
     OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
+
+void HiLogFlush(boolean syncFlag)
+{
+    FlushLog(syncFlag);
+}

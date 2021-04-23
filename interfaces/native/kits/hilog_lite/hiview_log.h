@@ -158,6 +158,13 @@ const char *HiLogGetModuleName(uint8 id);
 void HiLogPrintf(uint8 module, uint8 level, const char *nums,
     const char *fmt, ...) __attribute__((format(printf, 4, 5)));
 
+/*
+ * Interface for flush logs before the system restarts.
+ * @param syncFlag indicates synchronised flush or asynchronous flush.
+ * @attention Use this interface to flush logs to the UART or the files.
+ */
+void HiLogFlush(boolean syncFlag);
+
 /**
  * @brief Defines the pre-compiled macro for log levels.
  *

@@ -58,6 +58,13 @@ uint32 ReadLogFile(uint8 *buf, uint32 len);
  **/
 int32 LogContentFmt(char *outStr, int32 outStrLen, const uint8 *pLogContent);
 
+/*
+ * Interface for flush logs before the system restarts.
+ * @param syncFlag indicates synchronised flush or asynchronous flush.
+ * @attention Use this interface to flush logs to the UART or the files.
+ */
+void FlushLog(boolean syncFlag);
+
 #ifdef __cplusplus
 #if __cplusplus
 }
