@@ -37,7 +37,7 @@ int main(int argc, const char **argv)
     bool printFlag = true;
     if (argc > 1) {
         ret = HilogCmdProc(LOG_TAG, argc, argv);
-        if (ret == 0) {
+        if (ret == -1 || g_hiviewConfig.silenceMod == SILENT_MODE_ON) {
             return 0;
         }
     }

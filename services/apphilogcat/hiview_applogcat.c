@@ -103,7 +103,7 @@ int main(int argc, const char **argv)
 
     if (argc > 1) {
         ret = HilogCmdProc(LOG_TAG, argc, argv);
-        if (ret == 0) {
+        if (ret == -1) {
             return 0;
         }
     }
@@ -163,8 +163,11 @@ int main(int argc, const char **argv)
             continue;
         }
         buf[HILOG_LOGBUFFER - 1] = '\0';
-        printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour, info->tm_min,
-            info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
+
+        if (g_hiviewConfig.silenceMod == SILENT_MODE_OFF) {
+            printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour,
+                info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
+        }
 
         ret =
             fprintf(fpWrite, "%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour,
@@ -172,7 +175,7 @@ int main(int argc, const char **argv)
         // select file, if file1 is full, record file2, file2 is full, record file1
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
-            printf("[FATAL]File cant't open  fp1=%p, fp2=%p\n", fp1, fp2);
+            printf("[FATAL]File can't open  fp1=%p, fp2=%p\n", fp1, fp2);
             return 0;
         }
     }
