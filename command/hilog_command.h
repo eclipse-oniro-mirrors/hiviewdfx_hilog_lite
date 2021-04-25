@@ -27,6 +27,8 @@ extern "C" {
 #endif /* End of #ifdef __cplusplus */
 
 #define DOMAIN_ID_LENGTH 6
+#define SILENT_MODE_OFF 0
+#define SILENT_MODE_ON 1
 
 typedef struct {
     const unsigned char outputOption : 4; /* Control log output mode. Cannot be modified during running. */
@@ -35,6 +37,7 @@ typedef struct {
     unsigned char logSwitch : 1;          /* Indicates whether to enable the log component. */
     unsigned char eventSwitch : 1;        /* Indicates whether to enable the event component. */
     unsigned char dumpSwitch : 1;         /* Indicates whether to enable the dump component. */
+    unsigned char silenceMod : 1;         /* Silent mode, 0 for mode off, 1 for mdoe on. */
     unsigned char logOutputModule[DOMAIN_ID_LENGTH];        /* Control log output module. */
     unsigned short writeFailureCount;
 } HiviewConfig;
