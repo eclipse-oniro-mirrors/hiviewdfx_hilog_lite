@@ -66,7 +66,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
 void InitCoreLogOutput(void)
 {
-    g_logFlushInfo.mutex = MUTEX_InitValue();
+    g_logFlushInfo.mutex = HIVIEW_MutexInit();
     InitHiviewStaticCache(&g_logCache, LOG_CACHE, g_logCacheBuffer, sizeof(g_logCacheBuffer));
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, OutputLog2TextFile);
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, OutputLog2BinFile);
