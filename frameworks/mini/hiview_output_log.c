@@ -37,7 +37,9 @@ static char g_logLevelInfo[HILOG_LV_MAX] = {
     'F'  // "FATAL"
 };
 
+#ifndef DISABLE_HILOG_CACHE
 static uint8 g_logCacheBuffer[LOG_STATIC_CACHE_SIZE];
+#endif
 static HiviewCache g_logCache = {
     .size = 0,
     .buffer = NULL,
@@ -67,7 +69,9 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 void InitCoreLogOutput(void)
 {
     g_logFlushInfo.mutex = HIVIEW_MutexInit();
+#ifndef DISABLE_HILOG_CACHE
     InitHiviewStaticCache(&g_logCache, LOG_CACHE, g_logCacheBuffer, sizeof(g_logCacheBuffer));
+#endif
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, OutputLog2TextFile);
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, OutputLog2BinFile);
     HiviewRegisterMsgHandle(HIVIEW_MSG_OUTPUT_LOG_FLOW, OutputLogRealtime);
@@ -115,7 +119,12 @@ void OutputLog(const uint8 *data, uint32 len)
         return;
     }
 
-    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
+#ifdef DISABLE_HILOG_CACHE
+    boolean isDisableCache = true;
+#else
+    boolean isDisableCache = false;
+#endif
+    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG || isDisableCache) {
         char tempOutStr[LOG_FMT_MAX_LEN] = {0};
         if (LogContentFmt(tempOutStr, sizeof(tempOutStr), data) > 0) {
             HIVIEW_UartPrint(tempOutStr);
