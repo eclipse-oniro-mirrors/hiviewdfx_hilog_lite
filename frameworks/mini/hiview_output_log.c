@@ -120,9 +120,9 @@ void OutputLog(const uint8 *data, uint32 len)
     }
 
 #ifdef DISABLE_HILOG_CACHE
-    boolean isDisableCache = true;
+    boolean isDisableCache = TRUE;
 #else
-    boolean isDisableCache = false;
+    boolean isDisableCache = FALSE;
 #endif
     if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG || isDisableCache) {
         char tempOutStr[LOG_FMT_MAX_LEN] = {0};
