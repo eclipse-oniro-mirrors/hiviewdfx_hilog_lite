@@ -25,7 +25,7 @@
 #include "hiview_log_limit.h"
 #include "hiview_output_log.h"
 
-#define LOG_IS_OUTPUT(mod) (g_hiviewConfig.logOutputModule & (1 << (mod)))
+#define LOG_IS_OUTPUT(mod) (g_hiviewConfig.logOutputModule & (((uint64_t)1) << (mod)))
 
 static HiLogModuleInfo g_logModuleInfo[HILOG_MODULE_MAX];
 const char * const FUN_ARG_S = "0123456I";
