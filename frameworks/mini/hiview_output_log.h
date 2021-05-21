@@ -17,6 +17,7 @@
 #define HOS_LITE_HIVIEW_OUTPUT_LOG_H
 
 #include "ohos_types.h"
+#include "log.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -64,6 +65,23 @@ int32 LogContentFmt(char *outStr, int32 outStrLen, const uint8 *pLogContent);
  * @attention Use this interface to flush logs to the UART or the files.
  */
 void FlushLog(boolean syncFlag);
+
+/**
+ * Interface for register the Hilog handle.
+ * @param func Function Pointer.
+ **/
+void HiviewRegisterHilogProc(HilogProc func);
+
+/**
+ * Interface for deregister the Hilog handle.
+ **/
+void HiviewUnRegisterHilogProc(HilogProc func);
+
+/**
+ * Interface for get the Hilog Output to UART or file.
+ * @retval The the hilog output option.
+ **/
+uint32 HiviewGetConfigOption(void);
 
 #ifdef __cplusplus
 #if __cplusplus
