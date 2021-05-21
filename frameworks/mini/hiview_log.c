@@ -173,3 +173,18 @@ void HiLogFlush(boolean syncFlag)
 {
     FlushLog(syncFlag);
 }
+
+uint32 HiLogGetConfigOption(void)
+{
+    return HiviewGetConfigOption();
+}
+
+void HiLogRegisterProc(HilogProc func)
+{
+    return HiviewRegisterHilogProc(func);
+}
+
+void HiLogUnRegisterProc(HilogProc func)
+{
+    return HiviewUnRegisterHieventProc(func);
+}

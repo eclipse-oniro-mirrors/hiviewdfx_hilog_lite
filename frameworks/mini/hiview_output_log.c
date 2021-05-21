@@ -54,6 +54,7 @@ struct LogFlushInfo {
     HiviewMutexId_t mutex;
 };
 static LogFlushInfo g_logFlushInfo;
+static HilogProc g_hilogOutputProc = NULL;
 
 /* Output the log to UART using plaintext. */
 static void OutputLogRealtime(const Request *req);
@@ -109,6 +110,12 @@ void OutputLog(const uint8 *data, uint32 len)
 {
     if (data == NULL) {
         return;
+    }
+
+    if (g_hilogOutputProc != NULL) {
+        if (g_hilogOutputProc((HiLogContent *)data, len) == TRUE) {
+            return;
+        }
     }
 
     /* When the init of kernel is not finished, data is cached in the cache. */
@@ -483,5 +490,23 @@ void FlushLog(boolean syncFlag)
                     break;
             }
         }
+    }
+}
+
+void HiviewRegisterHilogProc(HilogProc func)
+{
+    g_hilogOutputProc = func;
+}
+
+uint32 HiviewGetConfigOption(void)
+{
+    return g_hiviewConfig.outputOption;
+}
+
+void HiviewUnRegisterHilogProc(HilogProc func)
+{
+    (void)func;
+    if (g_hilogOutputProc != NULL) {
+        g_hilogOutputProc = NULL;
     }
 }
