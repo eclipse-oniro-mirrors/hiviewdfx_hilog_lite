@@ -141,22 +141,30 @@ void OutputLog(const uint8 *data, uint32 len)
         return;
     }
 
-    if (WriteToCache(&g_logCache, (uint8 *)data, len) == (int32)len) {
-        if (g_logCache.usedSize >= HIVIEW_FILE_BUF_SIZE) {
-            switch (g_hiviewConfig.outputOption) {
-                case OUTPUT_OPTION_TEXT_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
-                    break;
-                case OUTPUT_OPTION_BIN_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
-                    break;
-                case OUTPUT_OPTION_FLOW:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
-                    break;
-                default:
-                    break;
-            }
+    boolean writeFail = FALSE;
+    if (WriteToCache(&g_logCache, (uint8 *)data, len) != (int32)len) {
+        HIVIEW_UartPrint("Hilog writeToCache error!\n");
+        writeFail = TRUE;
+    }
+    if (g_logCache.usedSize >= HIVIEW_HILOG_FILE_BUF_SIZE) {
+        switch (g_hiviewConfig.outputOption) {
+            case OUTPUT_OPTION_TEXT_FILE:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
+                break;
+            case OUTPUT_OPTION_BIN_FILE:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
+                break;
+            case OUTPUT_OPTION_FLOW:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
+                break;
+            default:
+                break;
         }
+    }
+
+    /* If the cache fails to be written, write the cache again. */
+    if (writeFail) {
+        WriteToCache(&g_logCache, (uint8 *)data, len);
     }
 }
 
