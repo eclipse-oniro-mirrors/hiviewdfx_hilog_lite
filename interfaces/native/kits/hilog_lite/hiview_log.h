@@ -120,8 +120,6 @@ typedef enum {
     HILOG_MODULE_MAX = 64
 } HiLogModuleType;
 
-#define TEMP_HILOG
-#ifndef TEMP_HIVIEW
 typedef enum {
     LOG_MULTI_PARA_0 = 0,
     LOG_MULTI_PARA_1 = 1,
@@ -148,7 +146,6 @@ typedef struct {
     uint32 values[LOG_MULTI_PARA_MAX];
 } HiLogContent;
 #pragma pack()
-#endif
 
 /**
  * @brief Registers module information with the logging system.
