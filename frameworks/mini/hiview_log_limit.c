@@ -26,7 +26,9 @@
 #define LOG_LIMIT_LEVEL2           30
 #define LOG_LIMIT_LEVEL3           60
 #define LOG_LIMIT_LEVEL4           120
+#ifndef LOG_LIMIT_DEFAULT
 #define LOG_LIMIT_DEFAULT          LOG_LIMIT_LEVEL2
+#endif
 
 static HiLogLimitRule *g_hilogLimitList = NULL;
 static void SetLimitThreshold(uint8 module, uint8 v);

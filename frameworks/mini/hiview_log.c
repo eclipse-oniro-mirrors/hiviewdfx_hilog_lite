@@ -35,6 +35,7 @@ static boolean CheckParameters(uint8 module, uint8 level);
 /* The first step does not involve memory allocation. */
 static void HiLogInit(void)
 {
+    HIVIEW_UartPrint("hilog will init.\n");
     InitCoreLogOutput();
 
     /* The module that is not registered cannot print the log. */
