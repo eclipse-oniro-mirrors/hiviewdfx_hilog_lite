@@ -58,6 +58,9 @@ void InitLogLimit(void)
 
 boolean LogIsLimited(uint8 module)
 {
+    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
+        return FALSE;
+    }
     /* covert ms to sec by dividing 1000, and integer overflow can be accepted */
     uint16 curTime = (uint16)(HIVIEW_GetCurrentTime() / MS_PER_SECOND);
     uint8 logNum;
