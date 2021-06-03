@@ -100,9 +100,9 @@ int SetOutputDomain(const char *mod)
 
     memset(g_hiviewConfig.logOutputModule, '0', modSize);
 
-    int destStart = ((DOMAIN_ID_LENGTH - 1 - len) > 0) ? (DOMAIN_ID_LENGTH - 1 - len) : 0;
-    int sourceStart = ((len - (DOMAIN_ID_LENGTH - 1)) > 0) ? (len - (DOMAIN_ID_LENGTH - 1)) : 0;
-    int copyLen = (len < (DOMAIN_ID_LENGTH - 1)) ? len : (DOMAIN_ID_LENGTH - 1);
+    int destStart = ((DOMAIN_ID_LENGTH - len) > 0) ? (DOMAIN_ID_LENGTH - len) : 0;
+    int sourceStart = ((len - DOMAIN_ID_LENGTH) > 0) ? (len - DOMAIN_ID_LENGTH) : 0;
+    int copyLen = (len < DOMAIN_ID_LENGTH) ? len : DOMAIN_ID_LENGTH;
 
     strncpy_s(g_hiviewConfig.logOutputModule + destStart, modSize - destStart, mod + sourceStart, copyLen);
 
