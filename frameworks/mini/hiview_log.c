@@ -182,10 +182,10 @@ uint32 HiLogGetConfigOption(void)
 
 void HiLogRegisterProc(HilogProc func)
 {
-    return HiviewRegisterHilogProc(func);
+    HiviewRegisterHilogProc(func);
 }
 
 void HiLogUnRegisterProc(HilogProc func)
 {
-    return HiviewUnRegisterHieventProc(func);
+    HiviewUnRegisterHilogProc(func);
 }
