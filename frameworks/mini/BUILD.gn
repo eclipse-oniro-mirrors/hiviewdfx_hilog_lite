@@ -37,6 +37,7 @@ static_library("hilog_lite") {
         "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
     ]
+    public_configs = ["//base/hiviewdfx/hiview_lite:hiview_lite_config"]
     deps = ["//base/hiviewdfx/hiview_lite"]
 }
 
