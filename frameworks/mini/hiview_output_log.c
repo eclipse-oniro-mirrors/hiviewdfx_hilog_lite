@@ -120,14 +120,6 @@ void OutputLog(const uint8 *data, uint32 len)
         }
     }
 
-    /* When the init of kernel is not finished, data is cached in the cache. */
-    if (g_hiviewConfig.hiviewInited == FALSE) {
-        if (WriteToCache(&g_logCache, data, len) != (int32)len) {
-            HILOG_INFO(HILOG_MODULE_HIVIEW, "Write log to cache failed.");
-        }
-        return;
-    }
-
 #ifdef DISABLE_HILOG_CACHE
     boolean isDisableCache = TRUE;
 #else
@@ -137,6 +129,14 @@ void OutputLog(const uint8 *data, uint32 len)
         char tempOutStr[LOG_FMT_MAX_LEN] = {0};
         if (LogContentFmt(tempOutStr, sizeof(tempOutStr), data) > 0) {
             HIVIEW_UartPrint(tempOutStr);
+        }
+        return;
+    }
+
+    /* When the init of kernel is not finished, data is cached in the cache. */
+    if (g_hiviewConfig.hiviewInited == FALSE) {
+        if (WriteToCache(&g_logCache, data, len) != (int32)len) {
+            HILOG_INFO(HILOG_MODULE_HIVIEW, "Write log to cache failed.");
         }
         return;
     }
