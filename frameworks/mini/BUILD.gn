@@ -18,6 +18,15 @@ declare_args() {
     ohos_hiviewdfx_hilog_lite_disable_cache = false
     ohos_hiviewdfx_hilog_lite_limit_level_default = 30
 }
+
+config("hilog_lite_config") {
+    include_dirs = [
+        "//base/hiviewdfx/hiview_lite",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    ]
+}
+
 static_library("hilog_lite") {
     sources = [
         "hiview_log.c",
@@ -32,12 +41,10 @@ static_library("hilog_lite") {
     if (ohos_hiviewdfx_hilog_lite_disable_cache) {
         defines += ["DISABLE_HILOG_CACHE"]
     }
-    include_dirs = [
-        "//base/hiviewdfx/hiview_lite",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    public_configs = [
+        "//base/hiviewdfx/hiview_lite:hiview_lite_config",
+        ":hilog_lite_config"
     ]
-    public_configs = ["//base/hiviewdfx/hiview_lite:hiview_lite_config"]
     deps = ["//base/hiviewdfx/hiview_lite"]
 }
 

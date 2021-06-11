@@ -218,6 +218,43 @@ void HiLogUnRegisterProc(HilogProc func);
  */
 uint32 HiLogGetConfigOption(void);
 
+#ifndef FILE_PROC_DEFINED
+#define FILE_PROC_DEFINED
+/**
+ * Callback function prototype for file processing .
+ *
+ * @param path the path of the file to be processed.
+ * @param type the type of the file to be processed.
+ * @param event the type of event that triggered the function. 0 for file full.
+ **/
+typedef void (*FileProc)(const char *path, uint8 type, uint8 event);
+#endif
+
+/**
+ * Add a monitoring function when hilog file is full.
+ *
+ * @param func callback function.
+ * @param dest hilog output target file path.
+ **/
+void HiLogFileAddWatcher(FileProc func, const char *dest);
+
+/**
+ * Remove monitoring of hilog file.
+ * 
+ * @param func callback function.
+ **/
+void HiLogFileRemoveWatcher(FileProc func);
+
+/**
+ * Process files according to mode.
+ *
+ * @param dest hilog output target file path.
+ * @param mode file processing mode. 0 for copy hilog file to dest and keep the
+ *             content in the source file, 1 for rename hilog file to dest.
+ * @return 0 if success, otherwise -1.
+ **/
+int HiLogFileProc(const char *dest, uint8 mode);
+
 /**
  * @brief Defines the pre-compiled macro for log levels.
  *
