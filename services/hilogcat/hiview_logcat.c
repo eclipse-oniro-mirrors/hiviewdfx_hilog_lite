@@ -13,17 +13,10 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <time.h>
 
 #include "hilog_command.h"
-#include "log.h"
-#include "securec.h"
 
 #define HILOG_DRIVER "/dev/hilog"
 #define HILOG_LOGBUFFER 1024

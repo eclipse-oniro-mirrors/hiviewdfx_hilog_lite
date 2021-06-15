@@ -221,7 +221,7 @@ uint32 HiLogGetConfigOption(void);
 #ifndef FILE_PROC_DEFINED
 #define FILE_PROC_DEFINED
 /**
- * Callback function prototype for file processing .
+ * Callback function prototype for file processing.
  *
  * @param path the path of the file to be processed.
  * @param type the type of the file to be processed.
