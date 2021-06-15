@@ -189,3 +189,18 @@ void HiLogUnRegisterProc(HilogProc func)
 {
     HiviewUnRegisterHilogProc(func);
 }
+
+void HiLogFileAddWatcher(FileProc func, const char *path)
+{
+    HiviewRegisterHiLogFileWatcher(func, path);
+}
+
+void HiLogFileRemoveWatcher(FileProc func)
+{
+    HiviewUnRegisterHiLogFileWatcher(func);
+}
+
+int HiLogFileProc(const char *dest, uint8 mode)
+{
+    return HiLogFileProcImp(dest, mode);
+}

@@ -13,20 +13,10 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <time.h>
-#include <string.h>
-#include <errno.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "hilog_command.h"
-#include "log.h"
 
 #define HILOG_LOGBUFFER 2048
 #define HILOG_PATH1 "/storage/data/log/hilog1.txt"

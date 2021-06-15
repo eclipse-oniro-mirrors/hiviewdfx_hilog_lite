@@ -48,6 +48,8 @@ static HiviewCache g_logCache = {
 };
 static HiviewFile g_logFile = {
     .path = HIVIEW_FILE_PATH_LOG,
+    .outPath = HIVIEW_FILE_OUT_PATH_LOG,
+    .pFunc = NULL,
     .fhandle = -1,
 };
 
@@ -524,4 +526,23 @@ void HiviewUnRegisterHilogProc(HilogProc func)
     if (g_hilogOutputProc != NULL) {
         g_hilogOutputProc = NULL;
     }
+}
+
+void HiviewRegisterHiLogFileWatcher(FileProc func, const char *path)
+{
+    RegisterFileWatcher(&g_logFile, func, path);
+}
+
+void HiviewUnRegisterHiLogFileWatcher(FileProc func)
+{
+    UnRegisterFileWatcher(&g_logFile, func);
+}
+
+int HiLogFileProcImp(const char* dest, uint8 mode)
+{
+    FlushLog(TRUE);
+    HIVIEW_MutexLock(g_logFlushInfo.mutex);
+    int ret = ProcFile(&g_logFile, dest, mode);
+    HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
+    return ret;
 }
