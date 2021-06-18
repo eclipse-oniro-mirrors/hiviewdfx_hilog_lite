@@ -114,6 +114,8 @@ typedef enum {
     HILOG_MODULE_XTS,
     /** SoftBus */
     HILOG_MODULE_SOFTBUS,
+    /** PowerMgr */
+    HILOG_MODULE_POWERMGR,
     /** OEM Customize */
     HILOG_MODULE_OEM_CUSTOMIZE = 32,
     /** Maximum number of modules */
