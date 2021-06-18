@@ -82,6 +82,8 @@ typedef enum {
     HILOG_MODULE_SAMGR,
     /** Update */
     HILOG_MODULE_ACE,
+    /** GRAPHIC*/
+    HILOG_MODULE_GRAPHIC,
     /** Third-party applications */
     HILOG_MODULE_APP,
     /** Maximum number of modules */
