@@ -205,3 +205,13 @@ int HiLogFileProc(const char *dest, uint8 mode)
 {
     return HiLogFileProcImp(dest, mode);
 }
+
+void HiLogOutputFileLock()
+{
+    HiLogOutputFileLockImp();
+}
+
+void HiLogOutputFileUnLock()
+{
+    HiLogOutputFileUnLockImp();
+}

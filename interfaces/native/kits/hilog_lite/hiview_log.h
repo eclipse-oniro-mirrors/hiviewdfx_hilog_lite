@@ -258,6 +258,18 @@ void HiLogFileRemoveWatcher(FileProc func);
 int HiLogFileProc(const char *dest, uint8 mode);
 
 /**
+ * Lock the hilog output target file.
+ *
+ **/
+void HiLogOutputFileLock();
+
+/**
+ * Unlock the hilog output target file.
+ *
+ **/
+void HiLogOutputFileUnLock();
+
+/**
  * @brief Defines the pre-compiled macro for log levels.
  *
  * By default, logs at all levels are output in the compilation phase. You can set this pre-compiled macro to a specific
