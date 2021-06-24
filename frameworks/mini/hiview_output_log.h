@@ -108,6 +108,18 @@ void HiviewUnRegisterHiLogFileWatcher(FileProc func);
  **/
 int HiLogFileProcImp(const char *dest, uint8 mode);
 
+/**
+ * Lock the hilog output target file.
+ *
+ **/
+void HiLogOutputFileLockImp();
+
+/**
+ * Unlock the hilog output target file.
+ *
+ **/
+void HiLogOutputFileUnLockImp();
+
 #ifdef __cplusplus
 #if __cplusplus
 }

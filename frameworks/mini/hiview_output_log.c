@@ -50,6 +50,7 @@ static HiviewFile g_logFile = {
     .path = HIVIEW_FILE_PATH_LOG,
     .outPath = HIVIEW_FILE_OUT_PATH_LOG,
     .pFunc = NULL,
+    .mutex = NULL,
     .fhandle = -1,
 };
 
@@ -59,6 +60,12 @@ struct LogFlushInfo {
 };
 static LogFlushInfo g_logFlushInfo;
 static HilogProc g_hilogOutputProc = NULL;
+
+typedef struct OutputLogInfo OutputLogInfo;
+struct OutputLogInfo {
+    HiviewMutexId_t mutex;
+};
+static OutputLogInfo g_outputLogInfo;
 
 /* Output the log to UART using plaintext. */
 static void OutputLogRealtime(const Request *req);
@@ -74,6 +81,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 void InitCoreLogOutput(void)
 {
     g_logFlushInfo.mutex = HIVIEW_MutexInit();
+    g_outputLogInfo.mutex = HIVIEW_MutexInit();
 #ifndef DISABLE_HILOG_CACHE
     InitHiviewStaticCache(&g_logCache, LOG_CACHE, g_logCacheBuffer, sizeof(g_logCacheBuffer));
 #endif
@@ -96,6 +104,7 @@ void InitLogOutput(void)
         (HIVIEW_LOG_FILE_SIZE / sizeof(HiLogContent)) * sizeof(HiLogContent)) == FALSE) {
         HILOG_ERROR(HILOG_MODULE_HIVIEW, "Open file[%d] failed.", HIVIEW_LOG_BIN_FILE);
     }
+    g_logFile.mutex = g_outputLogInfo.mutex;
 }
 
 void ClearLogOutput(void)
@@ -545,4 +554,14 @@ int HiLogFileProcImp(const char* dest, uint8 mode)
     int ret = ProcFile(&g_logFile, dest, mode);
     HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
     return ret;
+}
+
+void HiLogOutputFileLockImp()
+{
+    HIVIEW_MutexLock(g_outputLogInfo.mutex);
+}
+
+void HiLogOutputFileUnLockImp()
+{
+    HIVIEW_MutexUnlock(g_outputLogInfo.mutex);
 }
