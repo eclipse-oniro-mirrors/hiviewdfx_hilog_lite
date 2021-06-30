@@ -556,12 +556,12 @@ int HiLogFileProcImp(const char* dest, uint8 mode)
     return ret;
 }
 
-void HiLogOutputFileLockImp()
+void HiLogOutputFileLockImp(void)
 {
     HIVIEW_MutexLock(g_outputLogInfo.mutex);
 }
 
-void HiLogOutputFileUnLockImp()
+void HiLogOutputFileUnLockImp(void)
 {
     HIVIEW_MutexUnlock(g_outputLogInfo.mutex);
 }
