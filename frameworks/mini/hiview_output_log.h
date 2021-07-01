@@ -112,13 +112,13 @@ int HiLogFileProcImp(const char *dest, uint8 mode);
  * Lock the hilog output target file.
  *
  **/
-void HiLogOutputFileLockImp();
+void HiLogOutputFileLockImp(void);
 
 /**
  * Unlock the hilog output target file.
  *
  **/
-void HiLogOutputFileUnLockImp();
+void HiLogOutputFileUnLockImp(void);
 
 #ifdef __cplusplus
 #if __cplusplus

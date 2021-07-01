@@ -261,13 +261,13 @@ int HiLogFileProc(const char *dest, uint8 mode);
  * Lock the hilog output target file.
  *
  **/
-void HiLogOutputFileLock();
+void HiLogOutputFileLock(void);
 
 /**
  * Unlock the hilog output target file.
  *
  **/
-void HiLogOutputFileUnLock();
+void HiLogOutputFileUnLock(void);
 
 /**
  * @brief Defines the pre-compiled macro for log levels.
