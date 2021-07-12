@@ -20,10 +20,20 @@
 #include "unistd.h"
 #include <log.h>
 
+#ifndef LOSCFG_BASE_CORE_HILOG
+#include <stdatomic.h>
+#include "hilog_trace.h"
+#endif
+
 typedef int SecInt32;
 typedef unsigned int SecUnsignedInt32;
 typedef long long SecInt64;
 typedef unsigned long long SecUnsignedInt64;
+
+#ifndef LOSCFG_BASE_CORE_HILOG
+static RegisterFunc g_registerFunc = NULL;
+static atomic_int g_hiLogGetIdCallCount = 0;
+#endif
 
 #define SECUREC_BUFFER_SIZE 256
 
@@ -165,6 +175,31 @@ void SecWriteString(const char *string, int len, SecPrintfStream *f, int *pnumwr
         }
     }
 }
+
+#ifndef LOSCFG_BASE_CORE_HILOG
+int HiLogRegisterGetIdFun(RegisterFunc registerFunc)
+{
+    if (g_registerFunc != NULL) {
+        return -1;
+    }
+    g_registerFunc = registerFunc;
+    return 0;
+}
+
+void HiLogUnregisterGetIdFun(RegisterFunc registerFunc)
+{
+    if (g_registerFunc != registerFunc) {
+        return;
+    }
+
+    g_registerFunc = NULL;
+    while (atomic_load(&g_hiLogGetIdCallCount) != 0) {
+        /* do nothing, just wait current callback return */
+    }
+
+    return;
+}
+#endif
 
 #define SECUREC_WRITE_MULTI_CHAR SecWriteMultiChar
 #define SECUREC_WRITE_STRING SecWriteString
@@ -1469,6 +1504,38 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
     if (bufLen >= MAX_DOMAIN_TAG_SIZE) {
         return 0;
     }
+
+#ifndef LOSCFG_BASE_CORE_HILOG
+    /* print traceid */
+    if (g_registerFunc != NULL) {
+        char *logBuf = buf;
+        int traceBufLen = 0;
+        uint64_t chainId = 0;
+        uint32_t flag = 0;
+        uint64_t spanId = 0;
+        uint64_t parentSpanId = 0;
+        int ret = -1;  /* default value -1: invalid trace id */
+        atomic_fetch_add_explicit(&g_hiLogGetIdCallCount, 1, memory_order_relaxed);
+        RegisterFunc func = g_registerFunc;
+        if (g_registerFunc != NULL) {
+            ret = func(&chainId, &flag, &spanId, &parentSpanId);
+        }
+        atomic_fetch_sub_explicit(&g_hiLogGetIdCallCount, 1, memory_order_relaxed);
+        if (ret == 0) {  /* 0: trace id with span id */
+            traceBufLen = snprintf_s(logBuf, LOG_BUF_SIZE, LOG_BUF_SIZE - 1, "[%llx, %llx, %llx] ",
+                (unsigned long long)chainId, (unsigned long long)spanId, (unsigned long long)parentSpanId);
+        } else if (ret != -1) {  /* trace id without span id, -1: invalid trace id */
+            traceBufLen = snprintf_s(logBuf, LOG_BUF_SIZE, LOG_BUF_SIZE - 1, "[%llx] ",
+                (unsigned long long)chainId);
+        }
+        if (traceBufLen > 0) {
+            logBuf += traceBufLen;
+        } else {
+            traceBufLen = 0;
+        }
+    }
+#endif
+
     HiLog_Printf(buf + bufLen, LOG_BUF_SIZE - bufLen, LOG_BUF_SIZE - bufLen - 1, isDebugMode, fmt, ap);
 
 #ifdef LOSCFG_BASE_CORE_HILOG
