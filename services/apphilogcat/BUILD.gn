@@ -20,6 +20,7 @@ declare_args() {
     ohos_hiviewdfx_apphilogcat_log_level_debug = 3
     apphilogcat_on = 1
     apphilogcat_off = 0
+    enable_ohos_hiviewdfx_hilogcat_build = true
 }
 
 config("apphilogcat_config"){
@@ -55,6 +56,10 @@ static_library("apphilogcat_static") {
         "//base/hiviewdfx/hilog_lite/command:hilog_command_static"
     ]
     public_configs = [":apphilogcat_config"]
+
+    if(enable_ohos_hiviewdfx_hilogcat_build) {
+        deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
+    }
 }
 
 lite_component("apphilogcat") {
