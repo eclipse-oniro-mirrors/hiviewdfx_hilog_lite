@@ -98,7 +98,7 @@ int SetOutputDomain(const char *mod)
     int len = strlen(mod);
     int modSize = sizeof(g_hiviewConfig.logOutputModule);
 
-    memset(g_hiviewConfig.logOutputModule, '0', modSize);
+    (void)memset_s(g_hiviewConfig.logOutputModule, modSize, '0', modSize);
 
     int destStart = ((DOMAIN_ID_LENGTH - len) > 0) ? (DOMAIN_ID_LENGTH - len) : 0;
     int sourceStart = ((len - DOMAIN_ID_LENGTH) > 0) ? (len - DOMAIN_ID_LENGTH) : 0;
