@@ -98,7 +98,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    fd = open(HILOG_DRIVER, O_RDONLY);
+    fd = open(HILOG_DRIVER, O_RDONLY | O_CLOEXEC);
     if (fd < 0) {
         printf("hilog fd failed fd=%d\n", fd);
         return 0;
