@@ -104,7 +104,10 @@ int SetOutputDomain(const char *mod)
     int sourceStart = ((len - DOMAIN_ID_LENGTH) > 0) ? (len - DOMAIN_ID_LENGTH) : 0;
     int copyLen = (len < DOMAIN_ID_LENGTH) ? len : DOMAIN_ID_LENGTH;
 
-    strncpy_s(g_hiviewConfig.logOutputModule + destStart, modSize - destStart, mod + sourceStart, copyLen);
+    if (strncpy_s(g_hiviewConfig.logOutputModule + destStart, modSize - destStart, mod + sourceStart, copyLen) != 0) {
+        printf("Copy log domain fail : %s \n", mod);
+        return -1;
+    }
 
     printf("Set log domain : %s \n", g_hiviewConfig.logOutputModule);
     return 0;
