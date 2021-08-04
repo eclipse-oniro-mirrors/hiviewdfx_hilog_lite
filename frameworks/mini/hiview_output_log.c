@@ -539,11 +539,17 @@ void HiviewUnRegisterHilogProc(HilogProc func)
 
 void HiviewRegisterHiLogFileWatcher(FileProc func, const char *path)
 {
+    if (func == NULL || path == NULL) {
+        return;
+    }
     RegisterFileWatcher(&g_logFile, func, path);
 }
 
 void HiviewUnRegisterHiLogFileWatcher(FileProc func)
 {
+    if (func == NULL) {
+        return;
+    }
     UnRegisterFileWatcher(&g_logFile, func);
 }
 

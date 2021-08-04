@@ -103,7 +103,7 @@ int FlushAndSync(FILE* fp)
     return 0;
 }
 
-bool NeedFlush(char* buf)
+bool NeedFlush(const char* buf)
 {
 #define FLUSH_LOG_ARG_0 0
 #define FLUSH_LOG_ARG_1 1
@@ -157,7 +157,7 @@ int main(int argc, const char **argv)
         return 0;
     }
     while (1) {
-        char buf[HILOG_LOGBUFFER] = {0};
+        char buf[HILOG_LOGBUFFER + 1] = {0};
         ret = read(fd, buf, HILOG_LOGBUFFER);
         if (ret < sizeof(struct HiLogEntry)) {
             continue;

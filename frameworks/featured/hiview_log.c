@@ -1544,6 +1544,9 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
     if (g_hilogFd == -1) {
         g_hilogFd = open(HILOG_DRIVER, O_WRONLY);
     }
+    if (g_hilogFd == -1) {
+        return 0;
+    }
     ret = write(g_hilogFd, buf, strlen(buf) + 1);
 #endif
     return ret;
@@ -1569,6 +1572,9 @@ int FlushHilog(void)
 #else
     if (g_hilogFd == -1) {
         g_hilogFd = open(HILOG_DRIVER, O_WRONLY);
+    }
+    if (g_hilogFd == -1) {
+        return 0;
     }
     ret = write(g_hilogFd, buf, strlen(buf) + 1);
 #endif
