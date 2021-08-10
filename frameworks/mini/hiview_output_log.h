@@ -31,10 +31,11 @@ void ClearLogOutput(void);
 
 /**
  * Output the log to file.
+ * @param module log module.
  * @param data HiLogContent pointer.
  * @param len log data length.
  **/
-void OutputLog(const uint8 *data, uint32 len);
+void OutputLog(uint8 module, const uint8 *data, uint32 len);
 
 /**
  * Get the log file size.

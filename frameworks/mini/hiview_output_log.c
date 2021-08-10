@@ -14,16 +14,17 @@
  */
 
 #include "hiview_output_log.h"
-#include "hiview_def.h"
-#include "hiview_util.h"
 #include "hiview_cache.h"
 #include "hiview_config.h"
+#include "hiview_def.h"
 #include "hiview_file.h"
 #include "hiview_log.h"
+#include "hiview_log_limit.h"
 #include "hiview_service.h"
+#include "hiview_util.h"
 #include "message.h"
-#include "securec.h"
 #include "ohos_types.h"
+#include "securec.h"
 
 #include <time.h>
 
@@ -120,7 +121,7 @@ void ClearLogOutput(void)
     CloseHiviewFile(&g_logFile);
 }
 
-void OutputLog(const uint8 *data, uint32 len)
+void OutputLog(uint8 module, const uint8 *data, uint32 len)
 {
     if (data == NULL) {
         return;
@@ -138,6 +139,19 @@ void OutputLog(const uint8 *data, uint32 len)
     boolean isDisableCache = FALSE;
 #endif
 
+#ifdef DISABLE_HILOG_LITE_PRINT_LIMIT
+    boolean isDisablePrintLimited = TRUE;
+#else
+    boolean isDisablePrintLimited = FALSE;
+#endif
+    boolean isLogLimited = LogIsLimited(module);
+
+    if (!isDisablePrintLimited && isLogLimited) {
+        // The console output adopts the same restriction strategy as the file output,
+        // and the log output to the file is restricted.
+        return;
+    }
+
     int8 opt = GETOPTION(g_hiviewConfig.outputOption);
     boolean isPrint = g_hiviewConfig.outputOption >= OUTPUT_OPTION_PRINT;
     if (opt == OUTPUT_OPTION_DEBUG || isPrint || isDisableCache) {
@@ -147,7 +161,7 @@ void OutputLog(const uint8 *data, uint32 len)
         }
     }
 
-    if (opt == OUTPUT_OPTION_DEBUG || isDisableCache) {
+    if (opt == OUTPUT_OPTION_DEBUG || isDisableCache || isLogLimited) {
         return;
     }
 
