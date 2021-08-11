@@ -1544,6 +1544,9 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
     if (g_hilogFd == -1) {
         g_hilogFd = open(HILOG_DRIVER, O_WRONLY);
     }
+    if (g_hilogFd == -1) {
+        return 0;
+    }
     ret = write(g_hilogFd, buf, strlen(buf) + 1);
 #endif
     return ret;
@@ -1556,5 +1559,24 @@ int HiLogPrint(LogType bufID, LogLevel prio, unsigned int domain, const char *ta
     va_start(ap, fmt);
     ret = HiLogPrintArgs(bufID, prio, domain, tag, fmt, ap);
     va_end(ap);
+    return ret;
+}
+
+int FlushHilog(void)
+{
+    int ret;
+#define FLUSH_LOG_WRITE_LEN 3
+    char buf[FLUSH_LOG_WRITE_LEN] = {0x07, 0x07, '\0'};
+#ifdef LOSCFG_BASE_CORE_HILOG
+    ret = HiLogWriteInternal(buf, strlen(buf) + 1);
+#else
+    if (g_hilogFd == -1) {
+        g_hilogFd = open(HILOG_DRIVER, O_WRONLY);
+    }
+    if (g_hilogFd == -1) {
+        return 0;
+    }
+    ret = write(g_hilogFd, buf, strlen(buf) + 1);
+#endif
     return ret;
 }

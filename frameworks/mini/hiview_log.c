@@ -113,7 +113,7 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
     }
 
     if (g_hiviewConfig.logSwitch == HIVIEW_FEATURE_OFF || !CheckParameters(module, level) ||
-        LogIsLimited(module) || !LOG_IS_OUTPUT(module)) {
+        !LOG_IS_OUTPUT(module)) {
         return;
     }
 
@@ -134,7 +134,7 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
     }
     va_end(args);
 
-    OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
+    OutputLog(module, (uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
 
 void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, ...)
@@ -146,7 +146,7 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
     }
 
     if (g_hiviewConfig.logSwitch == HIVIEW_FEATURE_OFF || !CheckParameters(module, level) ||
-        LogIsLimited(module) || !LOG_IS_OUTPUT(module)) {
+        !LOG_IS_OUTPUT(module)) {
         return;
     }
 
@@ -167,7 +167,7 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
     }
     va_end(args);
 
-    OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
+    OutputLog(module, (uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
 
 void HiLogFlush(boolean syncFlag)

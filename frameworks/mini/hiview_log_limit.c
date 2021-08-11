@@ -57,7 +57,7 @@ void InitLogLimit(void)
 
 boolean LogIsLimited(uint8 module)
 {
-    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
+    if (GETOPTION(g_hiviewConfig.outputOption) == OUTPUT_OPTION_DEBUG) {
         return FALSE;
     }
     /* covert ms to sec by dividing 1000, and integer overflow can be accepted */

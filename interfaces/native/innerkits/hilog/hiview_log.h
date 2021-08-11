@@ -310,6 +310,8 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio,
  */
 #define HILOG_FATAL(type, ...) ((void)HiLogPrint(LOG_CORE, LOG_FATAL, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
 
+int FlushHilog(void);
+
 #define HILOG_DRIVER "/dev/hilog"
 #define NANOSEC_PER_MIRCOSEC 1000000
 struct HiLogEntry {

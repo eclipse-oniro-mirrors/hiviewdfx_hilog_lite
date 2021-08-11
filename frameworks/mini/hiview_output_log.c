@@ -14,16 +14,17 @@
  */
 
 #include "hiview_output_log.h"
-#include "hiview_def.h"
-#include "hiview_util.h"
 #include "hiview_cache.h"
 #include "hiview_config.h"
+#include "hiview_def.h"
 #include "hiview_file.h"
 #include "hiview_log.h"
+#include "hiview_log_limit.h"
 #include "hiview_service.h"
+#include "hiview_util.h"
 #include "message.h"
-#include "securec.h"
 #include "ohos_types.h"
+#include "securec.h"
 
 #include <time.h>
 
@@ -92,12 +93,12 @@ void InitCoreLogOutput(void)
 
 void InitLogOutput(void)
 {
-    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG ||
-        g_hiviewConfig.outputOption == OUTPUT_OPTION_FLOW) {
+    int8 opt = GETOPTION(g_hiviewConfig.outputOption);
+    if (opt == OUTPUT_OPTION_DEBUG || opt == OUTPUT_OPTION_FLOW) {
         return;
     }
     HiviewFileType type = HIVIEW_LOG_TEXT_FILE;
-    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_BIN_FILE) {
+    if (opt == OUTPUT_OPTION_BIN_FILE) {
         type = HIVIEW_LOG_BIN_FILE;
     }
     if (InitHiviewFile(&g_logFile, type,
@@ -109,17 +110,18 @@ void InitLogOutput(void)
 
 void ClearLogOutput(void)
 {
+    int8 opt = GETOPTION(g_hiviewConfig.outputOption);
     if (g_logCache.usedSize > 0) {
-        if (g_hiviewConfig.outputOption == OUTPUT_OPTION_TEXT_FILE) {
+        if (opt == OUTPUT_OPTION_TEXT_FILE) {
             OutputLog2TextFile(NULL);
-        } else if (g_hiviewConfig.outputOption == OUTPUT_OPTION_BIN_FILE) {
+        } else if (opt == OUTPUT_OPTION_BIN_FILE) {
             OutputLog2BinFile(NULL);
         }
     }
     CloseHiviewFile(&g_logFile);
 }
 
-void OutputLog(const uint8 *data, uint32 len)
+void OutputLog(uint8 module, const uint8 *data, uint32 len)
 {
     if (data == NULL) {
         return;
@@ -136,11 +138,29 @@ void OutputLog(const uint8 *data, uint32 len)
 #else
     boolean isDisableCache = FALSE;
 #endif
-    if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG || isDisableCache) {
+
+#ifdef DISABLE_HILOG_LITE_PRINT_LIMIT
+    boolean isDisablePrintLimited = TRUE;
+#else
+    boolean isDisablePrintLimited = FALSE;
+#endif
+    boolean isLogLimited = LogIsLimited(module);
+    if (!isDisablePrintLimited && isLogLimited) {
+        // The console output adopts the same restriction strategy as the file output,
+        // and the log output to the file is restricted.
+        return;
+    }
+
+    int8 opt = GETOPTION(g_hiviewConfig.outputOption);
+    boolean isPrint = g_hiviewConfig.outputOption >= OUTPUT_OPTION_PRINT;
+    if (opt == OUTPUT_OPTION_DEBUG || isPrint || isDisableCache) {
         char tempOutStr[LOG_FMT_MAX_LEN] = {0};
         if (LogContentFmt(tempOutStr, sizeof(tempOutStr), data) > 0) {
             HIVIEW_UartPrint(tempOutStr);
         }
+    }
+
+    if (opt == OUTPUT_OPTION_DEBUG || isDisableCache || isLogLimited) {
         return;
     }
 
@@ -158,7 +178,7 @@ void OutputLog(const uint8 *data, uint32 len)
         writeFail = TRUE;
     }
     if (g_logCache.usedSize >= HIVIEW_HILOG_FILE_BUF_SIZE) {
-        switch (g_hiviewConfig.outputOption) {
+        switch (opt) {
             case OUTPUT_OPTION_TEXT_FILE:
                 HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
                 break;
@@ -320,7 +340,7 @@ int32 LogContentFmt(char *outStr, int32 outStrLen, const uint8 *pLogContent)
     if (len >= 0) {
         if (isHash) {
             len += LogValuesFmtHash(outStr + len, outStrLen - len, logContentPtr);
-        } else if (g_hiviewConfig.outputOption == OUTPUT_OPTION_DEBUG) {
+        } else if (GETOPTION(g_hiviewConfig.outputOption) == OUTPUT_OPTION_DEBUG) {
             len += LogDebugValuesFmt(outStr + len, outStrLen - len, logContentPtr);
         } else {
             len += LogValuesFmt(outStr + len, outStrLen - len, logContentPtr);
@@ -486,9 +506,10 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
 void FlushLog(boolean syncFlag)
 {
+    int8 opt = GETOPTION(g_hiviewConfig.outputOption);
     if (g_logCache.usedSize > 0) {
         if (syncFlag == FALSE) {
-            switch (g_hiviewConfig.outputOption) {
+            switch (opt) {
                 case OUTPUT_OPTION_TEXT_FILE:
                     HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
                     break;
@@ -502,7 +523,7 @@ void FlushLog(boolean syncFlag)
                     break;
             }
         } else {
-            switch (g_hiviewConfig.outputOption) {
+            switch (opt) {
                 case OUTPUT_OPTION_TEXT_FILE:
                     OutputLog2TextFile(NULL);
                     break;
@@ -526,7 +547,7 @@ void HiviewRegisterHilogProc(HilogProc func)
 
 uint32 HiviewGetConfigOption(void)
 {
-    return g_hiviewConfig.outputOption;
+    return GETOPTION(g_hiviewConfig.outputOption);
 }
 
 void HiviewUnRegisterHilogProc(HilogProc func)
@@ -539,11 +560,17 @@ void HiviewUnRegisterHilogProc(HilogProc func)
 
 void HiviewRegisterHiLogFileWatcher(FileProc func, const char *path)
 {
+    if (func == NULL || path == NULL) {
+        return;
+    }
     RegisterFileWatcher(&g_logFile, func, path);
 }
 
 void HiviewUnRegisterHiLogFileWatcher(FileProc func)
 {
+    if (func == NULL) {
+        return;
+    }
     UnRegisterFileWatcher(&g_logFile, func);
 }
 
