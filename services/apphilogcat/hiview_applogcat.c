@@ -25,6 +25,9 @@
 #undef LOG_TAG
 #define LOG_TAG "apphilogcat"
 
+static int file1Size = 0;
+static int file2Size = 0;
+
 static int FileSize(const char *filename)
 {
     FILE *fp = fopen(filename, "r");
@@ -55,31 +58,60 @@ static FILE *FileClear(FILE **fp, const char *filename)
 
 FILE *SelectWriteFile(FILE **fp1, FILE *fp2)
 {
-    int file1Size = FileSize(HILOG_PATH1);
-    int file2Size = FileSize(HILOG_PATH2);
+    file1Size = FileSize(HILOG_PATH1);
+    file2Size = FileSize(HILOG_PATH2);
     if (file1Size < HILOG_MAX_FILELEN) {
         return *fp1;
     } else if (file2Size < HILOG_MAX_FILELEN) {
         return fp2;
     } else { // clear file1 write file 1
+        file1Size = 0;
         return FileClear(fp1, HILOG_PATH1);
     }
 }
 
 FILE *SwitchWriteFile(FILE **fp1, FILE **fp2, FILE *curFp)
 {
-    int file1Size = FileSize(HILOG_PATH1);
-    int file2Size = FileSize(HILOG_PATH2);
     // select file, if file1 is full, record file2, file2 is full, record file1
     if (file1Size < HILOG_MAX_FILELEN) {
         return *fp1;
     } else if (file2Size < HILOG_MAX_FILELEN) {
         return *fp2;
     } else if (curFp == *fp2) { // clear file1 write file 1
+        FlushAndSync(*fp2);
+        file1Size = 0;
         return FileClear(fp1, HILOG_PATH1);
     } else {
+        FlushAndSync(*fp1);
+        file2Size = 0;
         return FileClear(fp2, HILOG_PATH2);
     }
+}
+
+int FlushAndSync(FILE* fp)
+{
+    if (fp == NULL) {
+        return 0;
+    }
+    if (fflush(fp) != 0) {
+        return -1;
+    }
+    int fd = fileno(fp);
+    if (fsync(fd) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+bool NeedFlush(const char* buf)
+{
+#define FLUSH_LOG_ARG_0 0
+#define FLUSH_LOG_ARG_1 1
+#define FLUSH_LOG_FLAG  0x07
+    if (buf[FLUSH_LOG_ARG_0] == FLUSH_LOG_FLAG && buf[FLUSH_LOG_ARG_1] == FLUSH_LOG_FLAG) {
+        return true;
+    }
+    return false;
 }
 
 int main(int argc, const char **argv)
@@ -125,12 +157,19 @@ int main(int argc, const char **argv)
         return 0;
     }
     while (1) {
-        char buf[HILOG_LOGBUFFER] = {0};
+        char buf[HILOG_LOGBUFFER + 1] = {0};
         ret = read(fd, buf, HILOG_LOGBUFFER);
         if (ret < sizeof(struct HiLogEntry)) {
             continue;
         }
         struct HiLogEntry *head = (struct HiLogEntry *)buf;
+
+        if (NeedFlush(head->msg)) {
+            if (FlushAndSync(fpWrite) != 0) {
+                printf("flush and sync file err, fpWrite=%p\n", fpWrite);
+            }
+            continue;
+        }
 
         time_t rawtime;
         struct tm *info = NULL;
@@ -162,6 +201,15 @@ int main(int argc, const char **argv)
         ret =
             fprintf(fpWrite, "%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour,
                 info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
+        if (ret < 0) {
+            printf("[FATAL]File can't write fpWrite=%p\n", fpWrite);
+            return 0;
+        }
+        if (fpWrite == fp1) {
+            file1Size += ret;
+        } else if (fpWrite == fp2) {
+            file2Size += ret;
+        }
         // select file, if file1 is full, record file2, file2 is full, record file1
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
