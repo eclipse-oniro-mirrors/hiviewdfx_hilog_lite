@@ -121,14 +121,15 @@ void ClearLogOutput(void)
     CloseHiviewFile(&g_logFile);
 }
 
-void OutputLog(uint8 module, const uint8 *data, uint32 len)
+void OutputLog(const uint8 *data, uint32 len)
 {
     if (data == NULL) {
         return;
     }
 
+    HiLogContent *hiLogContent = (HiLogContent *)data;
     if (g_hilogOutputProc != NULL) {
-        if (g_hilogOutputProc((HiLogContent *)data, len) == TRUE) {
+        if (g_hilogOutputProc(hiLogContent, len) == TRUE) {
             return;
         }
     }
@@ -144,7 +145,7 @@ void OutputLog(uint8 module, const uint8 *data, uint32 len)
 #else
     boolean isDisablePrintLimited = FALSE;
 #endif
-    boolean isLogLimited = LogIsLimited(module);
+    boolean isLogLimited = LogIsLimited(hiLogContent->commonContent.module);
 
     if (!isDisablePrintLimited && isLogLimited) {
         // The console output adopts the same restriction strategy as the file output,
