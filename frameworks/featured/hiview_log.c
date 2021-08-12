@@ -1542,7 +1542,7 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
     ret = HiLogWriteInternal(buf, strlen(buf) + 1);
 #else
     if (g_hilogFd == -1) {
-        g_hilogFd = open(HILOG_DRIVER, O_WRONLY);
+        g_hilogFd = open(HILOG_DRIVER, O_WRONLY | O_CLOEXEC);
     }
     if (g_hilogFd == -1) {
         return 0;
