@@ -103,7 +103,7 @@ void InitLogOutput(void)
     }
     if (InitHiviewFile(&g_logFile, type,
         (HIVIEW_LOG_FILE_SIZE / sizeof(HiLogContent)) * sizeof(HiLogContent)) == FALSE) {
-        HILOG_ERROR(HILOG_MODULE_HIVIEW, "Open file[%d] failed.", HIVIEW_LOG_BIN_FILE);
+        HIVIEW_UartPrint("Open file[HIVIEW_LOG_BIN_FILE] failed.");
     }
     g_logFile.mutex = g_outputLogInfo.mutex;
 }
@@ -167,7 +167,7 @@ void OutputLog(uint8 module, const uint8 *data, uint32 len)
     /* When the init of kernel is not finished, data is cached in the cache. */
     if (g_hiviewConfig.hiviewInited == FALSE) {
         if (WriteToCache(&g_logCache, data, len) != (int32)len) {
-            HILOG_INFO(HILOG_MODULE_HIVIEW, "Write log to cache failed.");
+            HIVIEW_UartPrint("Write log to cache failed.");
         }
         return;
     }
@@ -211,7 +211,7 @@ static void OutputLogRealtime(const Request *req)
         sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
         if (logContent.commonContent.head != LOG_INFO_HEAD) {
             DiscardCacheData(&g_logCache);
-            HILOG_ERROR(HILOG_MODULE_HIVIEW, "Discard cache[%d] data.", LOG_CACHE);
+            HIVIEW_UartPrint("Discard cache[LOG_CACHE] data.");
             break;
         }
         len = logContent.commonContent.valueNumber * sizeof(uint32);
@@ -244,7 +244,7 @@ static void OutputLog2TextFile(const Request *req)
         sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
         if (logContent.commonContent.head != LOG_INFO_HEAD) {
             DiscardCacheData(&g_logCache);
-            HILOG_ERROR(HILOG_MODULE_HIVIEW, "Discard cache[%d] data.", LOG_CACHE);
+            HIVIEW_UartPrint("Discard cache[LOG_CACHE] data.");
             break;
         }
         len = logContent.commonContent.valueNumber * sizeof(uint32);
@@ -290,7 +290,7 @@ static void OutputLog2BinFile(const Request *req)
         len += sizeof(HiLogCommon);
         if (pCommonContent->head != LOG_INFO_HEAD) {
             DiscardCacheData(&g_logCache);
-            HILOG_ERROR(HILOG_MODULE_HIVIEW, "Discard cache[%d] data.", LOG_CACHE);
+            HIVIEW_UartPrint("Discard cache[LOG_CACHE] data.");
             break;
         }
         valueLen = pCommonContent->valueNumber * sizeof(uint32);
@@ -303,7 +303,7 @@ static void OutputLog2BinFile(const Request *req)
     }
     if (len > 0 && WriteToFile(&g_logFile, tmpBuffer, len) != len) {
         g_hiviewConfig.writeFailureCount++;
-        HILOG_ERROR(HILOG_MODULE_HIVIEW, "Failed to write log data.");
+        HIVIEW_UartPrint("Failed to write log data.");
     }
     HIVIEW_MemFree(MEM_POOL_HIVIEW_ID, tmpBuffer);
     HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
