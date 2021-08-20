@@ -134,7 +134,7 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
     }
     va_end(args);
 
-    OutputLog(module, (uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
+    OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
 
 void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, ...)
@@ -167,7 +167,7 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
     }
     va_end(args);
 
-    OutputLog(module, (uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
+    OutputLog((uint8 *)&logContent, sizeof(HiLogCommon) + sizeof(uint32) * argsNum);
 }
 
 void HiLogFlush(boolean syncFlag)
