@@ -15,6 +15,7 @@
 
 #include <fcntl.h>
 #include <time.h>
+#include <errno.h>
 
 #include "hilog_command.h"
 
@@ -138,22 +139,22 @@ int main(int argc, const char **argv)
 
     FILE *fp1 = fopen(HILOG_PATH1, "at");
     if (fp1 == NULL) {
+        printf("open err fp1 %s\n", strerror(errno));
         close(fd);
-        printf("open err fp1=%p\n", fp1);
         return 0;
     }
 
     FILE *fp2 = fopen(HILOG_PATH2, "at");
     if (fp2 == NULL) {
+        printf("open err fp2 %s\n", strerror(errno));
         fclose(fp1);
         close(fd);
-        printf("open err fp2=%p\n", fp2);
         return 0;
     }
     // First select
     fpWrite = SelectWriteFile(&fp1, fp2);
     if (fpWrite == NULL) {
-        printf("SelectWriteFile open err fp1=%p\n", fp1);
+        printf("SelectWriteFile open err\n");
         return 0;
     }
     while (1) {
@@ -166,7 +167,7 @@ int main(int argc, const char **argv)
 
         if (NeedFlush(head->msg)) {
             if (FlushAndSync(fpWrite) != 0) {
-                printf("flush and sync file err, fpWrite=%p\n", fpWrite);
+                printf("flush and sync file err\n");
             }
             continue;
         }
@@ -202,7 +203,7 @@ int main(int argc, const char **argv)
             fprintf(fpWrite, "%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour,
                 info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
         if (ret < 0) {
-            printf("[FATAL]File can't write fpWrite=%p\n", fpWrite);
+            printf("[FATAL]File can't write fpWrite %s\n", strerror(errno));
             return 0;
         }
         if (fpWrite == fp1) {
@@ -213,7 +214,7 @@ int main(int argc, const char **argv)
         // select file, if file1 is full, record file2, file2 is full, record file1
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
-            printf("[FATAL]File can't open  fp1=%p, fp2=%p\n", fp1, fp2);
+            printf("[FATAL]SwitchWriteFile failed\n");
             return 0;
         }
     }
