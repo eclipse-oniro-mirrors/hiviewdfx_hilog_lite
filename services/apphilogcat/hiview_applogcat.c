@@ -213,7 +213,6 @@ int main(int argc, const char **argv)
         // select file, if file1 is full, record file2, file2 is full, record file1
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
-            printf("[FATAL]File can't open  fp1=%p, fp2=%p\n", fp1, fp2);
             return 0;
         }
     }
