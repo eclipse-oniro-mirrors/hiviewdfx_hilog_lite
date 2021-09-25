@@ -13,59 +13,59 @@
 
 import("//build/lite/config/component/lite_component.gni")
 declare_args() {
-    ohos_hiviewdfx_hilog_file_size = 2048
-    enable_ohos_hiviewdfx_apphilogcat_init_release = false
-    enable_ohos_hiviewdfx_apphilogcat_init_debug = true
-    ohos_hiviewdfx_apphilogcat_log_level_release = 5
-    ohos_hiviewdfx_apphilogcat_log_level_debug = 3
-    apphilogcat_on = 1
-    apphilogcat_off = 0
-    enable_ohos_hiviewdfx_hilogcat_build = true
+  ohos_hiviewdfx_hilog_file_size = 2048
+  enable_ohos_hiviewdfx_apphilogcat_init_release = false
+  enable_ohos_hiviewdfx_apphilogcat_init_debug = true
+  ohos_hiviewdfx_apphilogcat_log_level_release = 5
+  ohos_hiviewdfx_apphilogcat_log_level_debug = 3
+  apphilogcat_on = 1
+  apphilogcat_off = 0
+  enable_ohos_hiviewdfx_hilogcat_build = true
+  ohos_hiviewdfx_apphilogcat_log_dir = "/storage/data/log"
 }
 
-config("apphilogcat_config"){
-    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
+config("apphilogcat_config") {
+  defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
 
-    if(enable_ohos_hiviewdfx_apphilogcat_init_release){
-        defines += ["APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on"]
-    }else{
-        defines += ["APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off"]
-    }
+  if (enable_ohos_hiviewdfx_apphilogcat_init_release) {
+    defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on" ]
+  } else {
+    defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off" ]
+  }
 
-    if(enable_ohos_hiviewdfx_apphilogcat_init_debug){
-        defines += ["APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on"]
-    }else{
-        defines += ["APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off"]
-    }
+  if (enable_ohos_hiviewdfx_apphilogcat_init_debug) {
+    defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on" ]
+  } else {
+    defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off" ]
+  }
 
-    defines += ["CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release"]
+  defines += [
+    "CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release",
+  ]
 
-    defines += ["CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug"]
+  defines +=
+      [ "CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug" ]
+
+  defines += [ "HILOG_DIR = \"$ohos_hiviewdfx_apphilogcat_log_dir\"" ]
 }
 
 static_library("apphilogcat_static") {
-    sources = [
-        "hiview_applogcat.c",
-    ]
-    cflags = [ "-Wall" ]
-    include_dirs = [
-        "//third_party/bounds_checking_function/include",
-    ]
-    deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//base/hiviewdfx/hilog_lite/command:hilog_command_static"
-    ]
-    public_configs = [":apphilogcat_config"]
+  sources = [ "hiview_applogcat.c" ]
+  cflags = [ "-Wall" ]
+  include_dirs = [ "//third_party/bounds_checking_function/include" ]
+  deps = [
+    "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+  ]
+  public_configs = [ ":apphilogcat_config" ]
 
-    if(enable_ohos_hiviewdfx_hilogcat_build) {
-        deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
-    }
+  if (enable_ohos_hiviewdfx_hilogcat_build) {
+    deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
+  }
 }
 
 lite_component("apphilogcat") {
-    target_type = "executable"
+  target_type = "executable"
 
-    features = [
-        ":apphilogcat_static",
-    ]
+  features = [ ":apphilogcat_static" ]
 }
