@@ -13,9 +13,13 @@
  * limitations under the License.
  */
 
-#include <fcntl.h>
-#include <time.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "hilog_command.h"
 
@@ -31,6 +35,8 @@
 
 static int file1Size = 0;
 static int file2Size = 0;
+
+int FlushAndSync(FILE *fp);
 
 static int FileSize(const char *filename)
 {
@@ -92,7 +98,7 @@ FILE *SwitchWriteFile(FILE **fp1, FILE **fp2, FILE *curFp)
     }
 }
 
-int FlushAndSync(FILE* fp)
+int FlushAndSync(FILE *fp)
 {
     if (fp == NULL) {
         return 0;
@@ -107,7 +113,7 @@ int FlushAndSync(FILE* fp)
     return 0;
 }
 
-bool NeedFlush(const char* buf)
+bool NeedFlush(const char *buf)
 {
 #define FLUSH_LOG_ARG_0 0
 #define FLUSH_LOG_ARG_1 1
@@ -118,10 +124,16 @@ bool NeedFlush(const char* buf)
     return false;
 }
 
+static void FileClose(FILE *file)
+{
+    if (file != NULL) {
+        fclose(file);
+    }
+}
+
 int main(int argc, const char **argv)
 {
-#define HILOG_PERMMISION 0700
-#define HILOG_TEST_ARGC 2
+#define HILOG_UMASK 007
     int fd;
     int ret;
     FILE *fpWrite = NULL;
@@ -140,6 +152,7 @@ int main(int argc, const char **argv)
         return 0;
     }
 
+    umask(HILOG_UMASK);
     FILE *fp1 = fopen(HILOG_PATH1, "at");
     if (fp1 == NULL) {
         printf("open err fp1 %s\n", strerror(errno));
@@ -150,7 +163,7 @@ int main(int argc, const char **argv)
     FILE *fp2 = fopen(HILOG_PATH2, "at");
     if (fp2 == NULL) {
         printf("open err fp2 %s\n", strerror(errno));
-        fclose(fp1);
+        FileClose(fp1);
         close(fd);
         return 0;
     }
@@ -158,6 +171,9 @@ int main(int argc, const char **argv)
     fpWrite = SelectWriteFile(&fp1, fp2);
     if (fpWrite == NULL) {
         printf("SelectWriteFile open err\n");
+        close(fd);
+        FileClose(fp1);
+        FileClose(fp2);
         return 0;
     }
     while (1) {
@@ -207,6 +223,9 @@ int main(int argc, const char **argv)
                 info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
         if (ret < 0) {
             printf("[FATAL]File can't write fpWrite %s\n", strerror(errno));
+            close(fd);
+            FileClose(fp1);
+            FileClose(fp2);
             return 0;
         }
         if (fpWrite == fp1) {
@@ -218,6 +237,9 @@ int main(int argc, const char **argv)
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
             printf("[FATAL]SwitchWriteFile failed\n");
+            close(fd);
+            FileClose(fp1);
+            FileClose(fp2);
             return 0;
         }
     }
