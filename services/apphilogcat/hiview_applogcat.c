@@ -20,8 +20,11 @@
 #include "hilog_command.h"
 
 #define HILOG_LOGBUFFER 2048
-#define HILOG_PATH1 "/storage/data/log/hilog1.txt"
-#define HILOG_PATH2 "/storage/data/log/hilog2.txt"
+#ifndef HILOG_DIR
+#define HILOG_DIR "/storage/data/log"
+#endif
+#define HILOG_PATH1 HILOG_DIR "/hilog1.txt"
+#define HILOG_PATH2 HILOG_DIR "/hilog2.txt"
 
 #undef LOG_TAG
 #define LOG_TAG "apphilogcat"
