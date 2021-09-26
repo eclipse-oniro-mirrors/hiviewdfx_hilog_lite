@@ -496,7 +496,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
     for (uint32 i = 0; i < paraNum && i < LOG_MULTI_PARA_MAX; i++) {
         len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-            "%u ", logContentPtr->values[i]);
+            "%d ", (int32)logContentPtr->values[i]);
         if (len < 0) {
             return len;
         }
