@@ -124,7 +124,9 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
     pCommon->fmt = fmt;
     pCommon->valueNumber = (uint8)argsNum;
     pCommon->task = (uint8)HIVIEW_GetTaskId();
-    pCommon->time = (uint32)(HIVIEW_GetCurrentTime() / MS_PER_SECOND);
+    uint64 cur = HIVIEW_GetCurrentTime();
+    pCommon->time = (uint32)(cur / MS_PER_SECOND);
+    pCommon->milli = (uint16)(cur % MS_PER_SECOND);
 
     uint8 i = 0;
     va_list args;
@@ -157,7 +159,9 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
     pCommon->fmt = (const char*)hash;
     pCommon->valueNumber = (uint8)argsNum;
     pCommon->task = (uint8)HIVIEW_GetTaskId();
-    pCommon->time = (uint32)(HIVIEW_GetCurrentTime() / MS_PER_SECOND);
+    uint64 cur = HIVIEW_GetCurrentTime();
+    pCommon->time = (uint32)(cur / MS_PER_SECOND);
+    pCommon->milli = (uint16)(cur % MS_PER_SECOND);
 
     uint8 i = 0;
     va_list args;
