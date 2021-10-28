@@ -379,7 +379,7 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
     min = nowTime.tm_min;
     sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
-    ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d-%02d %02d:%02d:%02d 0 %d %c %d/%s: ",
+    ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d-%02d %02d:%02d:%02d.%03d 0 %d %c %d/%s: ",
         month, day, hour, min, sec, commonContentPtr->milli, commonContentPtr->task, g_logLevelInfo[level],
         commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
 
