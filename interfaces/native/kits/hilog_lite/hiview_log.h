@@ -140,6 +140,7 @@ typedef struct {
     uint8 valueNumber : 4;
     uint8 task;
     uint32 time; /* seconds */
+    uint16 milli; /* millisecond, 0-999 */
     const char *fmt;
 } HiLogCommon;
 
