@@ -133,7 +133,7 @@ static void FileClose(FILE *file)
 
 int main(int argc, const char **argv)
 {
-#define HILOG_UMASK 007
+#define HILOG_UMASK 0027
     int fd;
     int ret;
     FILE *fpWrite = NULL;
