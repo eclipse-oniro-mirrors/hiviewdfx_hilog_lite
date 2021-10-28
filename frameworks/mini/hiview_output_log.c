@@ -368,21 +368,20 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
 {
     int32 ret;
     time_t time;
-    uint32 year, month, day, hour, min, sec;
+    uint32 month, day, hour, min, sec;
     uint8_t level;
     struct tm nowTime = {0};
 
     time = commonContentPtr->time;
     localtime_r(&time, &nowTime);
-    year = nowTime.tm_year + 1900;
     month = nowTime.tm_mon + 1;
     day = nowTime.tm_mday;
     hour = nowTime.tm_hour;
     min = nowTime.tm_min;
     sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
-    ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%04d-%02d-%02d %02d:%02d:%02d 0 %d %c %d/%s: ",
-        year, month, day, hour, min, sec, commonContentPtr->task, g_logLevelInfo[level],
+    ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d-%02d %02d:%02d:%02d.%03d 0 %d %c %d/%s: ",
+        month, day, hour, min, sec, commonContentPtr->milli, commonContentPtr->task, g_logLevelInfo[level],
         commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
 
     return ret;
@@ -497,7 +496,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
     for (uint32 i = 0; i < paraNum && i < LOG_MULTI_PARA_MAX; i++) {
         len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-            "%u ", logContentPtr->values[i]);
+            "%d ", (int32)logContentPtr->values[i]);
         if (len < 0) {
             return len;
         }

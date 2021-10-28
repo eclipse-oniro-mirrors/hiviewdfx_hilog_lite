@@ -13,20 +13,30 @@
  * limitations under the License.
  */
 
+#include <errno.h>
 #include <fcntl.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "hilog_command.h"
 
 #define HILOG_LOGBUFFER 2048
-#define HILOG_PATH1 "/storage/data/log/hilog1.txt"
-#define HILOG_PATH2 "/storage/data/log/hilog2.txt"
+#ifndef HILOG_DIR
+#define HILOG_DIR "/storage/data/log"
+#endif
+#define HILOG_PATH1 HILOG_DIR "/hilog1.txt"
+#define HILOG_PATH2 HILOG_DIR "/hilog2.txt"
 
 #undef LOG_TAG
 #define LOG_TAG "apphilogcat"
 
 static int file1Size = 0;
 static int file2Size = 0;
+
+int FlushAndSync(FILE *fp);
 
 static int FileSize(const char *filename)
 {
@@ -88,7 +98,7 @@ FILE *SwitchWriteFile(FILE **fp1, FILE **fp2, FILE *curFp)
     }
 }
 
-int FlushAndSync(FILE* fp)
+int FlushAndSync(FILE *fp)
 {
     if (fp == NULL) {
         return 0;
@@ -103,7 +113,7 @@ int FlushAndSync(FILE* fp)
     return 0;
 }
 
-bool NeedFlush(const char* buf)
+bool NeedFlush(const char *buf)
 {
 #define FLUSH_LOG_ARG_0 0
 #define FLUSH_LOG_ARG_1 1
@@ -114,10 +124,16 @@ bool NeedFlush(const char* buf)
     return false;
 }
 
+static void FileClose(FILE *file)
+{
+    if (file != NULL) {
+        fclose(file);
+    }
+}
+
 int main(int argc, const char **argv)
 {
-#define HILOG_PERMMISION 0700
-#define HILOG_TEST_ARGC 2
+#define HILOG_UMASK 0027
     int fd;
     int ret;
     FILE *fpWrite = NULL;
@@ -136,24 +152,28 @@ int main(int argc, const char **argv)
         return 0;
     }
 
+    umask(HILOG_UMASK);
     FILE *fp1 = fopen(HILOG_PATH1, "at");
     if (fp1 == NULL) {
+        printf("open err fp1 %s\n", strerror(errno));
         close(fd);
-        printf("open err fp1=%p\n", fp1);
         return 0;
     }
 
     FILE *fp2 = fopen(HILOG_PATH2, "at");
     if (fp2 == NULL) {
-        fclose(fp1);
+        printf("open err fp2 %s\n", strerror(errno));
+        FileClose(fp1);
         close(fd);
-        printf("open err fp2=%p\n", fp2);
         return 0;
     }
     // First select
     fpWrite = SelectWriteFile(&fp1, fp2);
     if (fpWrite == NULL) {
-        printf("SelectWriteFile open err fp1=%p\n", fp1);
+        printf("SelectWriteFile open err\n");
+        close(fd);
+        FileClose(fp1);
+        FileClose(fp2);
         return 0;
     }
     while (1) {
@@ -166,7 +186,7 @@ int main(int argc, const char **argv)
 
         if (NeedFlush(head->msg)) {
             if (FlushAndSync(fpWrite) != 0) {
-                printf("flush and sync file err, fpWrite=%p\n", fpWrite);
+                printf("flush and sync file err\n");
             }
             continue;
         }
@@ -202,7 +222,10 @@ int main(int argc, const char **argv)
             fprintf(fpWrite, "%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour,
                 info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
         if (ret < 0) {
-            printf("[FATAL]File can't write fpWrite=%p\n", fpWrite);
+            printf("[FATAL]File can't write fpWrite %s\n", strerror(errno));
+            close(fd);
+            FileClose(fp1);
+            FileClose(fp2);
             return 0;
         }
         if (fpWrite == fp1) {
@@ -213,7 +236,10 @@ int main(int argc, const char **argv)
         // select file, if file1 is full, record file2, file2 is full, record file1
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
-            printf("[FATAL]File can't open  fp1=%p, fp2=%p\n", fp1, fp2);
+            printf("[FATAL]SwitchWriteFile failed\n");
+            close(fd);
+            FileClose(fp1);
+            FileClose(fp2);
             return 0;
         }
     }
