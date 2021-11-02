@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "string.h"
-#include "stdarg.h"
+#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include "ohos_init.h"
 #include "hiview_def.h"
 #include "hiview_util.h"
@@ -217,4 +218,19 @@ void HiLogOutputFileLock(void)
 void HiLogOutputFileUnLock(void)
 {
     HiLogOutputFileUnLockImp();
+}
+
+uint32 HiLogGetLogLevel(void)
+{
+    return g_hiviewConfig.level;
+}
+
+boolean HiLogSetLogLevel(uint8 level)
+{
+    if (level >= HILOG_LV_DEBUG && level < HILOG_LV_MAX) {
+        g_hiviewConfig.level = level;
+        printf("Set log level: %d\n", level);
+        return TRUE;
+    }
+    return FALSE;
 }
