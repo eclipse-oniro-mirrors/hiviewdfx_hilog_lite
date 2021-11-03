@@ -234,7 +234,6 @@ static void OutputLog2TextFile(const Request *req)
     HIVIEW_MutexLock(g_logFlushInfo.mutex);
     HiLogContent logContent;
     char tempOutStr[LOG_FMT_MAX_LEN] = {0};
-    (void)req;
 
     if (g_logCache.usedSize < sizeof(HiLogCommon)) {
         HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
@@ -263,6 +262,9 @@ static void OutputLog2TextFile(const Request *req)
         }
     }
     HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
+    if (req != NULL && req->msgValue == SYNC_FILE) {
+        HIVIEW_FileSync(g_logFile.fhandle);
+    }
 }
 
 static void OutputLog2BinFile(const Request *req)
@@ -273,7 +275,6 @@ static void OutputLog2BinFile(const Request *req)
     uint16 valueLen;
     uint8 *tmpBuffer = NULL;
     uint16 outputSize = g_logCache.usedSize;
-    (void)req;
 
     if (outputSize < sizeof(HiLogCommon)) {
         HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
@@ -309,6 +310,9 @@ static void OutputLog2BinFile(const Request *req)
     }
     HIVIEW_MemFree(MEM_POOL_HIVIEW_ID, tmpBuffer);
     HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
+    if (req != NULL && req->msgValue == SYNC_FILE) {
+        HIVIEW_FileSync(g_logFile.fhandle);
+    }
 }
 
 uint32 GetLogFileSize(void)
@@ -512,24 +516,26 @@ void FlushLog(boolean syncFlag)
         if (syncFlag == FALSE) {
             switch (opt) {
                 case OUTPUT_OPTION_TEXT_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, SYNC_FILE);
                     break;
                 case OUTPUT_OPTION_BIN_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, SYNC_FILE);
                     break;
                 case OUTPUT_OPTION_FLOW:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
+                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, SYNC_FILE);
                     break;
                 default:
                     break;
             }
         } else {
+            Request request = {0};
+            request.msgValue = SYNC_FILE;
             switch (opt) {
                 case OUTPUT_OPTION_TEXT_FILE:
-                    OutputLog2TextFile(NULL);
+                    OutputLog2TextFile(&request);
                     break;
                 case OUTPUT_OPTION_BIN_FILE:
-                    OutputLog2BinFile(NULL);
+                    OutputLog2BinFile(&request);
                     break;
                 case OUTPUT_OPTION_FLOW:
                     OutputLogRealtime(NULL);
