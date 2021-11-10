@@ -483,6 +483,19 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
 #define HILOG_FATAL_HASH(mod, hash, ...)
 #endif
 
+/*
+ * Interface for get hilog level
+ * @return Returns current hilog level.
+ */
+uint32 HiLogGetLogLevel(void);
+
+/*
+ * Interface for set hilog level
+ * @param level identifies the level to be set
+ * @return Returns <b>TRUE</b> if setting log level is successful; returns <b>FALSE</b> otherwise.
+ */
+boolean HiLogSetLogLevel(uint8 level);
+
 #ifdef __cplusplus
 #if __cplusplus
 }
