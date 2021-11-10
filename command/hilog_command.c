@@ -15,6 +15,7 @@
 
 #include "hilog_command.h"
 
+#include <securec.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -183,7 +184,7 @@ int HilogSilenceProc()
     return 0;
 }
 
-int HilogCmdProc(const char* tag, int argc, const char **argv)
+int HilogCmdProc(const char *tag, int argc, char *argv[])
 {
     int ret = -1;
     int optionIndex = 0;
@@ -196,7 +197,7 @@ int HilogCmdProc(const char* tag, int argc, const char **argv)
         {"silence", no_argument, NULL, OPTION_SILENCE},
         {0, 0, 0, 0}
     };
-    const char* const shortOptions = "hL:D:";
+    const char *shortOptions = "hL:D:";
 
     while ((opt = getopt_long(argc, argv, shortOptions, longOptions, &optionIndex)) != -1) {
         switch (opt) {
@@ -240,7 +241,7 @@ bool FilterLevelLog(unsigned char setLevel, unsigned char logLevel)
     return false;
 }
 
-bool FilterModuleLog(unsigned char *setModule, const char *logModule)
+bool FilterModuleLog(const char *setModule, const char *logModule)
 {
     if (strncmp(setModule, HILOG_MODULE_MAX, DOMAIN_ID_LENGTH) == 0) {
         return true;

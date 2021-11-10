@@ -131,7 +131,7 @@ static void FileClose(FILE *file)
     }
 }
 
-int main(int argc, const char **argv)
+int main(int argc, char *argv[])
 {
 #define HILOG_UMASK 0027
     int fd;
