@@ -14,6 +14,7 @@
  */
 
 #include <fcntl.h>
+#include <unistd.h>
 #include <time.h>
 
 #include "hilog_command.h"
@@ -24,7 +25,7 @@
 #undef LOG_TAG
 #define LOG_TAG "hilogcat"
 
-int main(int argc, const char **argv)
+int main(int argc, char *argv[])
 {
     int ret;
     bool printFlag = true;
