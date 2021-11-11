@@ -15,45 +15,39 @@ import("//build/lite/config/component/lite_component.gni")
 import("//build/lite/ndk/ndk.gni")
 
 hilog_sources = [
-    "hiview_log.c",
-    "hilog.cpp",
+  "hilog.cpp",
+  "hiview_log.c",
 ]
 
 config("hilog_config") {
-    include_dirs = [
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-        "//third_party/bounds_checking_function/include",
-    ]
+  include_dirs = [
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+    "//third_party/bounds_checking_function/include",
+  ]
 }
 
 lite_library("hilog_static") {
-    target_type = "static_library"
-    sources = hilog_sources
-    public_configs = [":hilog_config"]
-    public_deps = [
-        "//third_party/bounds_checking_function:libsec_shared",
-    ]
-    cflags = [ "-Wall" ]
+  target_type = "static_library"
+  sources = hilog_sources
+  public_configs = [ ":hilog_config" ]
+  public_deps = [ "//third_party/bounds_checking_function:libsec_static" ]
+  cflags = [ "-Wall" ]
 }
 
 lite_library("hilog_shared") {
-    target_type = "shared_library"
-    sources = hilog_sources
-    public_configs = [":hilog_config"]
-    public_deps = [
-        "//third_party/bounds_checking_function:libsec_shared",
-    ]
-    cflags = [ "-Wall" ]
+  target_type = "shared_library"
+  sources = hilog_sources
+  public_configs = [ ":hilog_config" ]
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  cflags = [ "-Wall" ]
 }
 
 ndk_lib("hilog_ndk") {
-    lib_extension = ".so"
-    deps = [
-        ":hilog_shared"
-    ]
-    head_files = [
-        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog",
-        "//third_party/bounds_checking_function/include",
-    ]
+  lib_extension = ".so"
+  deps = [ ":hilog_shared" ]
+  head_files = [
+    "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog",
+    "//third_party/bounds_checking_function/include",
+  ]
 }
