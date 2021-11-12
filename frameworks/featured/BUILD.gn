@@ -32,7 +32,6 @@ lite_library("hilog_static") {
   sources = hilog_sources
   public_configs = [ ":hilog_config" ]
   public_deps = [ "//third_party/bounds_checking_function:libsec_static" ]
-  cflags = [ "-Wall" ]
 }
 
 lite_library("hilog_shared") {
@@ -40,7 +39,6 @@ lite_library("hilog_shared") {
   sources = hilog_sources
   public_configs = [ ":hilog_config" ]
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  cflags = [ "-Wall" ]
 }
 
 ndk_lib("hilog_ndk") {
