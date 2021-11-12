@@ -13,40 +13,34 @@
 
 import("//build/lite/config/component/lite_component.gni")
 
-config("hilog_command_config"){
-    include_dirs = [
-        "//base/hiviewdfx/hilog_lite/command"
-    ]
+config("hilog_command_config") {
+  include_dirs = [ "//base/hiviewdfx/hilog_lite/command" ]
 }
 
 lite_library("hilog_command_static") {
-    target_type = "static_library"
-    sources = [
-        "hilog_command.c",
-    ]
-    cflags = [ "-Wall" ]
-    public_configs = [
-        ":hilog_command_config",
-        "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config"
-    ]
-    deps = [
-        "//third_party/bounds_checking_function:libsec_shared",
-        "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
-    ]
+  target_type = "static_library"
+  sources = [ "hilog_command.c" ]
+  cflags = [ "-Wall" ]
+  public_configs = [
+    ":hilog_command_config",
+    "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config",
+  ]
+  deps = [
+    "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
 }
 
 lite_library("hilog_command_shared") {
-    target_type = "shared_library"
-    sources = [
-        "hilog_command.c",
-    ]
-    cflags = [ "-Wall" ]
-    public_configs = [
-        ":hilog_command_config",
-        "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config"
-    ]
-    deps = [
-        "//third_party/bounds_checking_function:libsec_shared",
-        "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
-    ]
+  target_type = "shared_library"
+  sources = [ "hilog_command.c" ]
+  cflags = [ "-Wall" ]
+  public_configs = [
+    ":hilog_command_config",
+    "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config",
+  ]
+  deps = [
+    "//base//hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
 }
