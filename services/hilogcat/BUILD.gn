@@ -14,23 +14,17 @@
 import("//build/lite/config/component/lite_component.gni")
 
 static_library("hilogcat_static") {
-    sources = [
-        "hiview_logcat.c",
-    ]
-    cflags = [ "-Wall" ]
-    include_dirs = [
-        "//third_party/bounds_checking_function/include",
-    ]
-    deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//third_party/bounds_checking_function:libsec_shared",
-        "//base/hiviewdfx/hilog_lite/command:hilog_command_static"
-    ]
+  sources = [ "hiview_logcat.c" ]
+  cflags = [ "-Wall" ]
+  include_dirs = [ "//third_party/bounds_checking_function/include" ]
+  deps = [
+    "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
 }
 
 lite_component("hilogcat") {
-    target_type = "executable"
-    features = [
-        ":hilogcat_static",
-    ]
+  target_type = "executable"
+  features = [ ":hilogcat_static" ]
 }
