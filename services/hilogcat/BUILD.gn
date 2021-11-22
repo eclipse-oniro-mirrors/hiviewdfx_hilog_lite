@@ -15,7 +15,6 @@ import("//build/lite/config/component/lite_component.gni")
 
 static_library("hilogcat_static") {
   sources = [ "hiview_logcat.c" ]
-  cflags = [ "-Wall" ]
   include_dirs = [ "//third_party/bounds_checking_function/include" ]
   deps = [
     "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
