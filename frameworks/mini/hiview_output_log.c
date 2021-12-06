@@ -383,6 +383,9 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
     min = nowTime.tm_min;
     sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
+    if (level < 0 || level >= HILOG_LV_MAX) {
+        level = 0;
+    }
     ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d-%02d %02d:%02d:%02d.%03d 0 %d %c %d/%s: ",
         month, day, hour, min, sec, commonContentPtr->milli, commonContentPtr->task, g_logLevelInfo[level],
         commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
@@ -447,6 +450,9 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
     switch (logContentPtr->commonContent.valueNumber) {
         case LOG_MULTI_PARA_0:
             ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
+            if (ret != EOK) {
+                ret = -1;
+            }
             break;
         case LOG_MULTI_PARA_1:
             ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
