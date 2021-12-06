@@ -20,7 +20,6 @@ config("hilog_command_config") {
 lite_library("hilog_command_static") {
   target_type = "static_library"
   sources = [ "hilog_command.c" ]
-  cflags = [ "-Wall" ]
   public_configs = [
     ":hilog_command_config",
     "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config",
@@ -34,7 +33,6 @@ lite_library("hilog_command_static") {
 lite_library("hilog_command_shared") {
   target_type = "shared_library"
   sources = [ "hilog_command.c" ]
-  cflags = [ "-Wall" ]
   public_configs = [
     ":hilog_command_config",
     "//base/hiviewdfx/hilog_lite/services/apphilogcat:apphilogcat_config",

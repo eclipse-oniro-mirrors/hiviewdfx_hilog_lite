@@ -51,7 +51,6 @@ config("apphilogcat_config") {
 
 static_library("apphilogcat_static") {
   sources = [ "hiview_applogcat.c" ]
-  cflags = [ "-Wall" ]
   include_dirs = [ "//third_party/bounds_checking_function/include" ]
   deps = [
     "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
