@@ -50,10 +50,11 @@ int main(int argc, char *argv[])
 
         time_t rawtime;
         struct tm *info = NULL;
+        struct tm nowTime = {0};
         unsigned int sec = head->sec;
         rawtime = (time_t)sec;
-        /* Get GMT time */
-        info = gmtime(&rawtime);
+        /* Get local time */
+        info = localtime_r(&rawtime, &nowTime);
 
         printFlag = FilterLevelLog(g_hiviewConfig.level, *(head->msg));
         if (!printFlag) {
