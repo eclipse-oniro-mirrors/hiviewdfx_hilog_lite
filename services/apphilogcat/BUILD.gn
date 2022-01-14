@@ -13,7 +13,7 @@
 
 import("//build/lite/config/component/lite_component.gni")
 declare_args() {
-  ohos_hiviewdfx_hilog_file_size = 2048
+  ohos_hiviewdfx_hilog_file_size = 1024000
   enable_ohos_hiviewdfx_apphilogcat_init_release = false
   enable_ohos_hiviewdfx_apphilogcat_init_debug = true
   ohos_hiviewdfx_apphilogcat_log_level_release = 5
