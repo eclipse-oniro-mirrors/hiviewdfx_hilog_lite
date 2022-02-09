@@ -30,12 +30,13 @@ typedef struct {
     uint8  logNum;
     uint16 baseTime;
     uint32 totalLogNum;
+    uint32 totalDropLogNum;
 } HiLogLimitRule;
 
 void InitLogLimit(void);
 boolean LogIsLimited(uint8 module);
 void SetLimitThreshold(uint8 module, uint8 v);
-const HiLogLimitRule* GetLogLimitRule(uint8 module);
+const HiLogLimitRule *GetLogLimitRule(uint8 module);
 
 #ifdef __cplusplus
 #if __cplusplus

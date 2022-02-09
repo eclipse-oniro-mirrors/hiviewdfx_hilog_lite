@@ -49,6 +49,7 @@ void InitLogLimit(void)
         pRule->logNum = 0;
         pRule->baseTime = 0;
         pRule->totalLogNum = 0;
+        pRule->totalDropLogNum = 0;
     }
     SetLimitThreshold(HILOG_MODULE_HIVIEW, LOG_LIMIT_LEVEL3);
     SetLimitThreshold(HILOG_MODULE_APP, LOG_LIMIT_LEVEL2);
@@ -89,6 +90,7 @@ boolean LogIsLimited(uint8 module)
         }
     } else {
         if (logNum > pLimitRule->maxNum) {
+            pLimitRule->totalDropLogNum++;
             return TRUE;
         }
     }
@@ -107,9 +109,10 @@ void SetLimitThreshold(uint8 module, uint8 v)
     pRule->logNum = 0;
     pRule->baseTime = 0;
     pRule->totalLogNum = 0;
+    pRule->totalDropLogNum = 0;
 }
 
-const HiLogLimitRule* GetLogLimitRule(uint8 module)
+const HiLogLimitRule *GetLogLimitRule(uint8 module)
 {
     if (module >= HILOG_MODULE_MAX) {
         return NULL;
