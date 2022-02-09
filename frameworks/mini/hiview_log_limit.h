@@ -29,10 +29,13 @@ typedef struct {
     uint8  maxNum;      /* the max num limit of log line */
     uint8  logNum;
     uint16 baseTime;
+    uint32 totalLogNum;
 } HiLogLimitRule;
 
 void InitLogLimit(void);
 boolean LogIsLimited(uint8 module);
+void SetLimitThreshold(uint8 module, uint8 v);
+const HiLogLimitRule* GetLogLimitRule(uint8 module);
 
 #ifdef __cplusplus
 #if __cplusplus

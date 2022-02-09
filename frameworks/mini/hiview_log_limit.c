@@ -30,7 +30,6 @@
 #endif
 
 static HiLogLimitRule *g_hilogLimitList = NULL;
-static void SetLimitThreshold(uint8 module, uint8 v);
 
 void InitLogLimit(void)
 {
@@ -78,6 +77,7 @@ boolean LogIsLimited(uint8 module)
         pLimitRule->baseTime = (uint16)(HIVIEW_GetCurrentTime() / MS_PER_SECOND);
     }
     pLimitRule->logNum++;
+    pLimitRule->totalLogNum++;
     logNum = pLimitRule->logNum;
     baseTime = pLimitRule->baseTime;
     if ((curTime < baseTime) || ((curTime - baseTime) >= LOG_LIMIT_CHECK_DURATION)) {
@@ -95,7 +95,7 @@ boolean LogIsLimited(uint8 module)
     return FALSE;
 }
 
-static void SetLimitThreshold(uint8 module, uint8 v)
+void SetLimitThreshold(uint8 module, uint8 v)
 {
     if (g_hilogLimitList == NULL) {
         return;
@@ -105,4 +105,12 @@ static void SetLimitThreshold(uint8 module, uint8 v)
     pRule->maxNum = v;
     pRule->logNum = 0;
     pRule->baseTime = 0;
+}
+
+const HiLogLimitRule* GetLogLimitRule(uint8 module)
+{
+    if (module >= HILOG_MODULE_MAX) {
+        return NULL;
+    }
+    return g_hilogLimitList + module;
 }
