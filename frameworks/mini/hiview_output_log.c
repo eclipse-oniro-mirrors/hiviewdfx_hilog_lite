@@ -68,6 +68,9 @@ struct OutputLogInfo {
 };
 static OutputLogInfo g_outputLogInfo;
 
+static int32 g_retryInitCount = 0;
+#define MAX_RETRY_COUNT 100
+
 /* Output the log to UART using plaintext. */
 static void OutputLogRealtime(const Request *req);
 /* Output the log to FLASH using text. */
@@ -257,6 +260,15 @@ static void OutputLog2TextFile(const Request *req)
             // prevent writing '\0' character to file
             len--;
         }
+        if (g_logFile.fhandle < 0) {
+            if (g_retryInitCount < MAX_RETRY_COUNT) {
+                InitLogOutput();
+            }
+            g_retryInitCount++;
+        } else {
+            // once success, clean retry count
+            g_retryInitCount = 0;
+        }
         if (len > 0 && WriteToFile(&g_logFile, (uint8 *)tempOutStr, len) != len) {
             g_hiviewConfig.writeFailureCount++;
         }
@@ -298,11 +310,25 @@ static void OutputLog2BinFile(const Request *req)
         }
         valueLen = pCommonContent->valueNumber * sizeof(uint32);
         if (valueLen > 0) {
+            if ((int32)len + (int32)valueLen > (int32)outputSize) {
+                DiscardCacheData(&g_logCache);
+                HIVIEW_UartPrint("Discard cache[LOG_CACHE] data.");
+                break;
+            }
             if (ReadFromCache(&g_logCache, tmpBuffer + len, valueLen) != valueLen) {
                 continue;
             }
             len += valueLen;
         }
+    }
+    if (g_logFile.fhandle < 0) {
+        if (g_retryInitCount < MAX_RETRY_COUNT) {
+            InitLogOutput();
+        }
+        g_retryInitCount++;
+    } else {
+        // once success, clean retry count
+        g_retryInitCount = 0;
     }
     if (len > 0 && WriteToFile(&g_logFile, tmpBuffer, len) != len) {
         g_hiviewConfig.writeFailureCount++;
@@ -384,7 +410,7 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
     min = nowTime.tm_min;
     sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
-    if (level < 0 || level >= HILOG_LV_MAX) {
+    if (level >= HILOG_LV_MAX) {
         level = 0;
     }
     ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%02d-%02d %02d:%02d:%02d.%03d 0 %d %c %d/%s: ",
@@ -573,7 +599,7 @@ void HiviewUnRegisterHilogProc(HilogProc func)
 
 void HiviewRegisterHiLogFileWatcher(FileProc func, const char *path)
 {
-    if (func == NULL || path == NULL) {
+    if (func == NULL) {
         return;
     }
     RegisterFileWatcher(&g_logFile, func, path);
