@@ -86,7 +86,8 @@ boolean LogIsLimited(uint8 module)
         pLimitRule->baseTime = curTime;
         pLimitRule->logNum = 0;
         if (logNum > pLimitRule->maxNum) {
-            HILOG_WARN(module, "log limit, drop lines %u", logNum - pLimitRule->maxNum);
+            HILOG_WARN(module, "log limit, log lines:%u, drop lines:%u, total log lines:%u, total drop lines:%u",
+                logNum, logNum - pLimitRule->maxNum, pLimitRule->totalLogNum, pLimitRule->totalDropLogNum);
         }
     } else {
         if (logNum > pLimitRule->maxNum) {
