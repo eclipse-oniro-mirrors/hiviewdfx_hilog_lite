@@ -64,8 +64,8 @@ CORE_INIT_PRI(HiLogInit, 0);
 
 static boolean CheckParameters(uint8 module, uint8 level)
 {
-    if ((level < g_hiviewConfig.level) ||  (level < HILOG_COMPILE_LEVEL)
-        || (module >= HILOG_MODULE_MAX) || (g_logModuleInfo[module].name == NULL)) {
+    if ((level < g_hiviewConfig.level) ||  (level < HILOG_COMPILE_LEVEL) ||
+        (module >= HILOG_MODULE_MAX) || (g_logModuleInfo[module].name == NULL)) {
         return FALSE;
     }
 

@@ -15,6 +15,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <securec.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -57,7 +58,9 @@ static int FileSize(const char *filename)
 
 static FILE *FileClear(FILE **fp, const char *filename)
 {
-    fclose(*fp);
+    if (*fp != NULL) {
+        fclose(*fp);
+    }
     *fp = fopen(filename, "w");
     if (*fp == NULL) {
         return NULL;
@@ -134,8 +137,8 @@ static void FileClose(FILE *file)
 int main(int argc, char *argv[])
 {
 #define HILOG_UMASK 0027
-    int fd;
-    int ret;
+    int fd = -1;
+    int ret = -1;
     FILE *fpWrite = NULL;
     bool printFlag = true;
 
@@ -176,8 +179,15 @@ int main(int argc, char *argv[])
         FileClose(fp2);
         return 0;
     }
+    char *buf = malloc(HILOG_LOGBUFFER + 1);
+    if (buf == NULL) {
+        close(fd);
+        FileClose(fp1);
+        FileClose(fp2);
+        return 0;
+    }
     while (1) {
-        char buf[HILOG_LOGBUFFER + 1] = {0};
+        (void)memset_s(buf, HILOG_LOGBUFFER + 1, 0, HILOG_LOGBUFFER + 1);
         ret = read(fd, buf, HILOG_LOGBUFFER);
         if (ret < sizeof(struct HiLogEntry)) {
             continue;
@@ -244,5 +254,9 @@ int main(int argc, char *argv[])
             return 0;
         }
     }
+    free(buf);
+    close(fd);
+    FileClose(fp1);
+    FileClose(fp2);
     return 0;
 }

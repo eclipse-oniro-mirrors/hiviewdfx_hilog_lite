@@ -513,10 +513,7 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
             break;
     }
 
-    if (ret < 0) {
-        ret = 0;
-    }
-    return ret;
+    return (ret < 0) ? 0 : ret;
 }
 
 static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)

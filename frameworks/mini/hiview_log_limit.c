@@ -115,7 +115,7 @@ void SetLimitThreshold(uint8 module, uint8 v)
 
 const HiLogLimitRule *GetLogLimitRule(uint8 module)
 {
-    if (module >= HILOG_MODULE_MAX) {
+    if (module >= HILOG_MODULE_MAX || g_hilogLimitList == NULL) {
         return NULL;
     }
     return g_hilogLimitList + module;

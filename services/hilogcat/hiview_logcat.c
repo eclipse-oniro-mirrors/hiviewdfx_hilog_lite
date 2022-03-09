@@ -14,6 +14,7 @@
  */
 
 #include <fcntl.h>
+#include <securec.h>
 #include <unistd.h>
 #include <time.h>
 
@@ -40,8 +41,13 @@ int main(int argc, char *argv[])
         HILOG_ERROR(LOG_CORE, "open hilog driver failed\n");
         return 0;
     }
+    char *buf = malloc(HILOG_LOGBUFFER);
+    if (buf == NULL) {
+        close(fd);
+        return 0;
+    }
     while (1) {
-        char buf[HILOG_LOGBUFFER] = {0};
+        (void)memset_s(buf, HILOG_LOGBUFFER, 0, HILOG_LOGBUFFER);
         ret = read(fd, buf, HILOG_LOGBUFFER);
         if (ret < sizeof(struct HiLogEntry)) {
             continue;
@@ -72,5 +78,7 @@ int main(int argc, char *argv[])
         printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour, info->tm_min,
             info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
     }
+    free(buf);
+    close(fd);
     return 0;
 }

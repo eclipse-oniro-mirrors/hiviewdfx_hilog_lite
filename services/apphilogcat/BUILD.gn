@@ -55,6 +55,7 @@ static_library("apphilogcat_static") {
   deps = [
     "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
   ]
   public_configs = [ ":apphilogcat_config" ]
 
