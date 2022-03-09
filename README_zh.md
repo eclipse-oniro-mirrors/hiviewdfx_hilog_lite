@@ -148,7 +148,7 @@
 
 ## 使用-小型系统<a name="s33e0a62bc1dd4a2a9578fc22bd023f11"></a>
 
-**Native C/C++**接口
+**Native C/C++接口**
 
 hilog  可用API
 
@@ -250,8 +250,8 @@ HILOG_FATAL(type, ...)
 
 [DFX子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/DFX%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-**hiviwdfx\_hilog\_lite**
+**hiviewdfx\_hilog\_lite**
 
-[hiviwdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README_zh.md)
+[hiviewdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README_zh.md)
 
-[hiviwdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README_zh.md)
+[hiviewdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README_zh.md)

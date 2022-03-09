@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0
 include $(LITEOSTOPDIR)/config.mk
 
 MODULE_NAME := hilog

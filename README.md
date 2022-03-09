@@ -67,7 +67,7 @@ The overall code of the mini system is developed based on the C standard library
 ## Log Function for the Mini System<a name="sd6e99f792bc942f9bb5aa92111be7aff"></a>
 
 -   To add a module \(for example, Module A\) and print logs, perform the following steps:
-    1.  **Add the module ID. **
+    1.  **Add the module ID.**
 
         Add  **HILOG\_MODULE\_A**  to  **base/hiviewdfx/interfaces/hilog\_lite/interfaces/native/kits/hilog\_lite**.
 
@@ -296,8 +296,8 @@ Parameter description
 
 [DFX subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/dfx.md)
 
-**hiviwdfx\_hilog\_lite**
+**hiviewdfx\_hilog\_lite**
 
-[hiviwdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README.md)
+[hiviewdfx\_hiview\_lite](https://gitee.com/openharmony/hiviewdfx_hiview_lite/blob/master/README.md)
 
-[hiviwdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README.md)
+[hiviewdfx\_hievent\_lite](https://gitee.com/openharmony/hiviewdfx_hievent_lite/blob/master/README.md)
