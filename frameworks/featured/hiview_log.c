@@ -1491,6 +1491,7 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
     char buf[LOG_BUF_SIZE] = {0};
     bool isDebugMode = 1;
     unsigned int bufLen;
+    (void)bufID;
 
 #ifdef OHOS_RELEASE
     isDebugMode = 0;
