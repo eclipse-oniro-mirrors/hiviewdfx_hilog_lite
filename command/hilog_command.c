@@ -132,7 +132,7 @@ int SetOutputLevel(char cmd)
         return -1;
     }
 
-    if (SetLogLevel(level) == true) {
+    if (SetLogLevel(level)) {
         printf("Set the log output level success.\n");
         return 0;
     }
