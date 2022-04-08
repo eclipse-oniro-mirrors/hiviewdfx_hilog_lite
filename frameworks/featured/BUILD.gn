@@ -13,6 +13,9 @@
 
 import("//build/lite/config/component/lite_component.gni")
 import("//build/lite/ndk/ndk.gni")
+declare_args() {
+  ohos_hiviewdfx_disable_privacy_feature = false
+}
 
 hilog_sources = [
   "hilog.cpp",
@@ -25,6 +28,9 @@ config("hilog_config") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "//third_party/bounds_checking_function/include",
   ]
+  if (ohos_hiviewdfx_disable_privacy_feature) {
+    defines = [ "DISABLE_HILOG_PRIVACY" ]
+  }
 }
 
 lite_library("hilog_static") {

@@ -1496,6 +1496,9 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
 #ifdef OHOS_RELEASE
     isDebugMode = 0;
 #endif
+#ifdef DISABLE_HILOG_PRIVACY
+    isDebugMode = 1;
+#endif
     if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "%c %05X/%s: ", g_logLevelInfo[prio], (domain & DOMAIN_FILTER),
         tag) == -1) {
         return 0;
