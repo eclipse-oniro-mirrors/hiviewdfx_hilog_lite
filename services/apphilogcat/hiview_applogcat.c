@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
     fd = open(HILOG_DRIVER, O_RDONLY | O_CLOEXEC);
     if (fd < 0) {
-        printf("hilog fd failed fd=%d\n", fd);
+        printf("hilog fd failed %s\n", strerror(errno));
         return 0;
     }
 
