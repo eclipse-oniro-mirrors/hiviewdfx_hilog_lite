@@ -118,6 +118,8 @@ typedef enum {
     HILOG_MODULE_POWERMGR,
     /** UIKit */
     HILOG_MODULE_UIKIT,
+    /** Global sub-system */
+    HILOG_MODULE_GLOBAL,
     /** OEM Customize */
     HILOG_MODULE_OEM_CUSTOMIZE = 32,
     /** Maximum number of modules */
