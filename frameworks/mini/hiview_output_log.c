@@ -614,7 +614,7 @@ int HiLogFileProcImp(const char* dest, uint8 mode)
 {
     FlushLog(TRUE);
     HIVIEW_MutexLock(g_logFlushInfo.mutex);
-    int ret = ProcFile(&g_logFile, dest, mode);
+    int ret = ProcFile(&g_logFile, dest, (FileProcMode)mode);
     HIVIEW_MutexUnlock(g_logFlushInfo.mutex);
     return ret;
 }
