@@ -35,7 +35,9 @@ static RegisterFunc g_registerFunc = NULL;
 static atomic_int g_hiLogGetIdCallCount = 0;
 #endif
 
+#ifndef SECUREC_BUFFER_SIZE
 #define SECUREC_BUFFER_SIZE 256
+#endif
 
 #define SECUREC_MAX_PRECISION SECUREC_BUFFER_SIZE
 /* max. # bytes in multibyte char  ,see MB_LEN_MAX */

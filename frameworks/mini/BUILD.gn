@@ -38,10 +38,10 @@ static_library("hilog_lite") {
     "hiview_output_log.c",
   ]
   defines = [
-    "HIVIEW_LOG_FILE_SIZE = $ohos_hiviewdfx_hilog_lite_file_size",
-    "LOG_LIMIT_DEFAULT = $ohos_hiviewdfx_hilog_lite_limit_level_default",
-    "LOG_STATIC_CACHE_SIZE = $ohos_hiviewdfx_log_static_cache_size",
-    "HIVIEW_HILOG_FILE_BUF_SIZE = $ohos_hiviewdfx_hiview_hilog_file_buf_size",
+    "HIVIEW_LOG_FILE_SIZE=$ohos_hiviewdfx_hilog_lite_file_size",
+    "LOG_LIMIT_DEFAULT=$ohos_hiviewdfx_hilog_lite_limit_level_default",
+    "LOG_STATIC_CACHE_SIZE=$ohos_hiviewdfx_log_static_cache_size",
+    "HIVIEW_HILOG_FILE_BUF_SIZE=$ohos_hiviewdfx_hiview_hilog_file_buf_size",
   ]
   if (ohos_hiviewdfx_hilog_lite_disable_cache) {
     defines += [ "DISABLE_HILOG_CACHE" ]
@@ -53,6 +53,12 @@ static_library("hilog_lite") {
     "//base/hiviewdfx/hiview_lite:hiview_lite_config",
     ":hilog_lite_config",
   ]
+  if (board_toolchain_type == "iccarm") {
+    cflags = [
+      "--diag_suppress",
+      "Pa039",
+    ]
+  }
   deps = [ "//base/hiviewdfx/hiview_lite" ]
 }
 
