@@ -1520,7 +1520,7 @@ int HiLogPrintArgs(LogType bufID, LogLevel prio, unsigned int domain, const char
         uint32_t flag = 0;
         uint64_t spanId = 0;
         uint64_t parentSpanId = 0;
-        int ret = -1;  /* default value -1: invalid trace id */
+        ret = -1;  /* default value -1: invalid trace id */
         atomic_fetch_add_explicit(&g_hiLogGetIdCallCount, 1, memory_order_relaxed);
         RegisterFunc func = g_registerFunc;
         if (g_registerFunc != NULL) {
