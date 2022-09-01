@@ -25,7 +25,7 @@ declare_args() {
 config("hilog_lite_config") {
   include_dirs = [
     "//base/hiviewdfx/hiview_lite",
-    "//utils/native/lite/include",
+    "//commonlibrary/utils_lite/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
   ]
