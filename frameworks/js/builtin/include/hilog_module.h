@@ -24,11 +24,11 @@
 
 namespace OHOS {
 namespace ACELite {
-typedef struct  AddLogContentOutParams {
+typedef struct AddLogContentOutParams {
     size_t *pos;
     size_t *count;
     HilogString *logContent;
-};
+} AddLogContentOutParams;
 
 class HilogModule {
 public:
