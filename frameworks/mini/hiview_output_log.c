@@ -53,6 +53,7 @@ static HiviewFile g_logFile = {
     .pFunc = NULL,
     .mutex = NULL,
     .fhandle = -1,
+    .configSize = 0,
 };
 
 typedef struct LogFlushInfo LogFlushInfo;
