@@ -188,7 +188,7 @@ const char *HiLogGetModuleName(uint8 id);
  * @attention Do not use this interface directly, you should use the HILOG_XXX interface.
  */
 void HiLogPrintf(uint8 module, uint8 level, const char *nums,
-    const char *fmt, ...) __attribute__((format(printf, 4, 5)));
+    const char *fmt, ...);
 
 /*
  * Interface for flush logs before the system restarts.
