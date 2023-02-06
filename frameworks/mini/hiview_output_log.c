@@ -480,6 +480,8 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
             ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
             if (ret != EOK) {
                 ret = -1;
+            }else{
+                ret = strlen(logContentPtr->commonContent.fmt);
             }
             break;
         case LOG_MULTI_PARA_1:
