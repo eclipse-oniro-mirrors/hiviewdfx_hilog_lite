@@ -31,6 +31,14 @@ config("hilog_config") {
   if (ohos_hiviewdfx_disable_privacy_feature) {
     defines = [ "DISABLE_HILOG_PRIVACY" ]
   }
+  if (ohos_kernel_type != "liteos_m") {
+    cflags = [
+      "-Wall",
+      "-fno-common",
+      "-fno-strict-aliasing",
+      "-O2",
+    ]
+  }
 }
 
 lite_library("hilog_static") {
