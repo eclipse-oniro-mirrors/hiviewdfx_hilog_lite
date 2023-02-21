@@ -88,7 +88,11 @@ void HilogVector::Push(HilogVector *vector, const char *element, ValueType type)
     }
     if (vector->str != nullptr && vector->type != nullptr) {
         size_t length = sizeof(char) * (strlen(element) + 1);
-        vector->str[vector->size] = static_cast<char*>(malloc(length));
+        char *tempStr = static_cast<char*>(malloc(length));
+        if (tempStr == nullptr) {
+            return;
+        }
+        vector->str[vector->size] = tempStr;
         memset_s(vector->str[vector->size], length, 0, length);
         memcpy_s(vector->str[vector->size], length, element, sizeof(char) * strlen(element));
         vector->type[vector->size] = type;
