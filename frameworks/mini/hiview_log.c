@@ -53,6 +53,7 @@ static void HiLogInit(void)
         HiLogRegisterModule(HILOG_MODULE_SOFTBUS, "SOFTBUS") == FALSE ||
         HiLogRegisterModule(HILOG_MODULE_POWERMGR, "POWERMGR") == FALSE ||
         HiLogRegisterModule(HILOG_MODULE_UIKIT, "UIKIT") == FALSE ||
+        HiLogRegisterModule(HILOG_MODULE_GLOBAL, "GLOBAL") == FALSE ||
         HiLogRegisterModule(HILOG_MODULE_DATAMGR, "DATAMGR") == FALSE) {
         return;
     }
