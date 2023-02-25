@@ -118,6 +118,8 @@ typedef enum {
     HILOG_MODULE_POWERMGR,
     /** UIKit */
     HILOG_MODULE_UIKIT,
+    /** Global sub-system */
+    HILOG_MODULE_GLOBAL,
     /** Data Manager */
     HILOG_MODULE_DATAMGR,
     /** OEM Customize */
