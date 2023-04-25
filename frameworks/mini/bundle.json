@@ -31,6 +31,18 @@
         "build": {
             "sub_component": [
                 "//base/hiviewdfx/hilog_lite/frameworks/mini:hilog_lite"
+            ],
+            "inner_kits": [
+                {
+                  "name": "//base/hiviewdfx/hilog_lite/frameworks/mini:hilog_lite",
+                  "header": {
+                    "header_files": [
+                      "hiview_log.h",
+                      "log.h"
+                    ],
+                    "header_base": "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite"
+                  }
+                }
             ]
         }
     }
