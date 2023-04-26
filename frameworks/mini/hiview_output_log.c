@@ -519,23 +519,79 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
     return (ret < 0) ? 0 : ret;
 }
 
+static int32 IntAppendStr(char* str, int32 num, char end)
+{
+    int32 digits = 0;
+    if (num == 0) {
+        str[0] = '0';
+        digits++;
+        str[1] = end;
+        return digits + 1;
+    }
+    int32 temp = num > 0 ? num : -num;
+    while (temp > 0) {
+        temp /= 10;
+        digits++;
+    }
+    if (num < 0) {
+        str[0] = '-';
+        temp = -num;
+        str++;
+    } else {
+        temp = num;
+    }
+    for (int32 i = digits - 1; i >= 0; i--) {
+        str[i] = temp % 10 + '0';
+        temp /= 10;
+    }
+    str[digits] = end;
+    if (num < 0) {
+        digits ++;
+    }
+    return digits + 1;
+}
+
+static int UIntAppendStr(char* str, uint32 num, char end)
+{
+    int32 digits = 0;
+    if (num == 0) {
+        str[0] = '0';
+        digits++;
+        str[1] = end;
+        return digits + 1;
+    }
+    uint32 temp = num;
+    while (temp > 0) {
+        temp /= 10;
+        digits++;
+    }
+    temp = num;
+    for (int32 i = digits - 1; i >= 0; i--) {
+        str[i] = temp % 10 + '0';
+        temp /= 10;
+    }
+    str[digits] = end;
+    return digits + 1;
+}
+
 static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)
 {
     int32 outLen = 0;
     uint32 paraNum = logContentPtr->commonContent.valueNumber;
-    int32 len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-        "hash:%u para:", (uint32)logContentPtr->commonContent.fmt);
-    if (len < 0) {
-        return len;
+    int32 ret = strncpy_s(&desStrPtr[outLen], desLen - outLen, "hash:", strlen("hash:"));
+    if (ret != 0) {
+        return -ret;
     }
+    outLen += strlen("hash:");
+    int32 len = UIntAppendStr(&desStrPtr[outLen], (uint32)logContentPtr->commonContent.fmt, ' ');
     outLen += len;
-
+    ret = strncpy_s(&desStrPtr[outLen], desLen - outLen, "para:", strlen("para:"));
+    if (ret != 0) {
+        return -ret;
+    }
+    outLen += strlen("para:");
     for (uint32 i = 0; i < paraNum && i < LOG_MULTI_PARA_MAX; i++) {
-        len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-            "%d ", (int32)logContentPtr->values[i]);
-        if (len < 0) {
-            return len;
-        }
+        len = IntAppendStr(&desStrPtr[outLen], (int32)logContentPtr->values[i], ' ');
         outLen += len;
     }
     return outLen;
