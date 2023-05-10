@@ -46,7 +46,7 @@ if (ohos_build_type == "debug") {
     ]
     if (ohos_kernel_type == "liteos_m") {
       deps += [
-        "//foundation/graphic/ui:ui",
+        "//foundation/arkui/ui_lite:ui",
         "//third_party/jerryscript:jerry_engine",
       ]
     } else {
