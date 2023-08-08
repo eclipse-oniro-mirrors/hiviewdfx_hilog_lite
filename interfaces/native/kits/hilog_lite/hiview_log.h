@@ -122,6 +122,8 @@ typedef enum {
     HILOG_MODULE_GLOBAL,
     /** Data Manager */
     HILOG_MODULE_DATAMGR,
+    /** Init */
+    HILOG_MODULE_INIT,
     /** OEM Customize */
     HILOG_MODULE_OEM_CUSTOMIZE = 32,
     /** Maximum number of modules */
