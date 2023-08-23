@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -48,11 +48,16 @@ lite_library("hilog_static") {
   public_deps = [ "//third_party/bounds_checking_function:libsec_static" ]
 }
 
-lite_library("hilog_shared") {
-  target_type = "shared_library"
-  sources = hilog_sources
-  public_configs = [ ":hilog_config" ]
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+if (ohos_kernel_type != "liteos_m") {
+  lite_library("hilog_shared") {
+    target_type = "shared_library"
+    sources = hilog_sources
+    public_configs = [ ":hilog_config" ]
+    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  }
+} else {
+  group("hilog_shared") {
+  }
 }
 
 ndk_lib("hilog_ndk") {
