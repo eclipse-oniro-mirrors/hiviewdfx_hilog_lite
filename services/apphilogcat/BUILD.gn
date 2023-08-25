@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,49 +23,52 @@ declare_args() {
   enable_ohos_hiviewdfx_hilogcat_build = true
   ohos_hiviewdfx_apphilogcat_log_dir = "/storage/data/log"
 }
+if (ohos_kernel_type != "liteos_m") {
+  config("apphilogcat_config") {
+    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
 
-config("apphilogcat_config") {
-  defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
+    if (enable_ohos_hiviewdfx_apphilogcat_init_release) {
+      defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on" ]
+    } else {
+      defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off" ]
+    }
 
-  if (enable_ohos_hiviewdfx_apphilogcat_init_release) {
-    defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on" ]
-  } else {
-    defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off" ]
+    if (enable_ohos_hiviewdfx_apphilogcat_init_debug) {
+      defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on" ]
+    } else {
+      defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off" ]
+    }
+
+    defines += [ "CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release" ]
+
+    defines += [
+      "CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug",
+    ]
+
+    defines += [ "HILOG_DIR = \"$ohos_hiviewdfx_apphilogcat_log_dir\"" ]
   }
 
-  if (enable_ohos_hiviewdfx_apphilogcat_init_debug) {
-    defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on" ]
-  } else {
-    defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off" ]
+  static_library("apphilogcat_static") {
+    sources = [ "hiview_applogcat.c" ]
+    include_dirs = [ "//third_party/bounds_checking_function/include" ]
+    deps = [
+      "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    public_configs = [ ":apphilogcat_config" ]
+
+    if (enable_ohos_hiviewdfx_hilogcat_build) {
+      deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
+    }
   }
 
-  defines += [
-    "CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release",
-  ]
+  lite_component("apphilogcat") {
+    target_type = "executable"
 
-  defines +=
-      [ "CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug" ]
-
-  defines += [ "HILOG_DIR = \"$ohos_hiviewdfx_apphilogcat_log_dir\"" ]
-}
-
-static_library("apphilogcat_static") {
-  sources = [ "hiview_applogcat.c" ]
-  include_dirs = [ "//third_party/bounds_checking_function/include" ]
-  deps = [
-    "//base/hiviewdfx/hilog_lite/command:hilog_command_static",
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
-  public_configs = [ ":apphilogcat_config" ]
-
-  if (enable_ohos_hiviewdfx_hilogcat_build) {
-    deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
+    features = [ ":apphilogcat_static" ]
   }
-}
-
-lite_component("apphilogcat") {
-  target_type = "executable"
-
-  features = [ ":apphilogcat_static" ]
+} else {
+  group("apphilogcat") {
+  }
 }
