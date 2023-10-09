@@ -16,9 +16,7 @@
     "component": {
         "name": "hilog_lite",
         "subsystem": "hiviewdfx",
-        "syscap": [
-            "SystemCapability.HiviewDFX.HiLogLite"
-        ],
+        "syscap": [],
         "adapted_system_type": [
             "mini",
             "small"
