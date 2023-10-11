@@ -2,9 +2,12 @@
     "name": "@ohos/hilog_lite",
     "description": "Log services for liteos-m and liteos-a kernel.",
     "optional": "false",
-    "version": "3.1",
+    "version": "4.0.2",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
+    "homePage": "https://gitee.com/openharmony",
+    "repository": "https://gitee.com/openharmony/hiviewdfx_hilog_lite",
+    "supplier": "Organization: OpenHarmony",
     "segment": {
         "destPath": "base/hiviewdfx/hilog_lite"
     },
@@ -13,9 +16,7 @@
     "component": {
         "name": "hilog_lite",
         "subsystem": "hiviewdfx",
-        "syscap": [
-            "SystemCapability.HiviewDFX.HiLogLite"
-        ],
+        "syscap": [],
         "adapted_system_type": [
             "mini",
             "small"
@@ -24,6 +25,11 @@
       "ram": "~500KB",
         "deps": {
             "components": [
+                "ace_engine_lite",
+                "battery_lite",
+                "hiview_lite",
+                "samgr_lite",
+                "utils_lite"
             ],
             "third_party": [
                 "bounds_checking_function"
