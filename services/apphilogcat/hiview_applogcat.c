@@ -234,6 +234,7 @@ int main(int argc, char *argv[])
                 info->tm_min, info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
         if (ret < 0) {
             printf("[FATAL]File can't write fpWrite %s\n", strerror(errno));
+            free(buf);
             close(fd);
             FileClose(fp1);
             FileClose(fp2);
@@ -248,6 +249,7 @@ int main(int argc, char *argv[])
         fpWrite = SwitchWriteFile(&fp1, &fp2, fpWrite);
         if (fpWrite == NULL) {
             printf("[FATAL]SwitchWriteFile failed\n");
+            free(buf);
             close(fd);
             FileClose(fp1);
             FileClose(fp2);
