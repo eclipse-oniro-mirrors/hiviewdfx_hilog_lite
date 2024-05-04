@@ -367,10 +367,10 @@ static int SecDecodeSize(SecChar ch, SecFormatAttr *attr, const SecChar **format
             attr->flags |= SECUREC_FLAG_I64; /* %I  to  INT64 */
 #endif
             if ((**format == SECUREC_CHAR('6')) && (*((*format) + 1) == SECUREC_CHAR('4'))) {
-                (*format) += 2;
+                (*format) += 2; /* Add 2 to skip I64 */
                 attr->flags |= SECUREC_FLAG_I64; /* %I64  to  INT64 */
             } else if ((**format == SECUREC_CHAR('3')) && (*((*format) + 1) == SECUREC_CHAR('2'))) {
-                (*format) += 2;
+                (*format) += 2; /* Add 2 to skip I32 */
                 attr->flags &= ~SECUREC_FLAG_I64; /* %I64  to  INT32 */
             } else if ((**format == SECUREC_CHAR('d')) || (**format == SECUREC_CHAR('i')) ||
                 (**format == SECUREC_CHAR('o')) || (**format == SECUREC_CHAR('u')) || (**format == SECUREC_CHAR('x')) ||
@@ -542,9 +542,9 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
 
     char *floatBuf = NULL;
     SecFormatBuf formatBuf;
-    static const char *itoaUpperDigits = "0123456789ABCDEFX";
-    static const char *itoaLowerDigits = "0123456789abcdefx";
-    const char *digits = itoaUpperDigits;
+    static const char *ITOA_UPPER_DIGITS = "0123456789ABCDEFX";
+    static const char *ITOA_LOWER_DIGITS = "0123456789abcdefx";
+    const char *digits = ITOA_UPPER_DIGITS;
     int ii = 0;
 
     unsigned int radix;
@@ -798,7 +798,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
 
                         /* compute the precision value */
                         if (formatAttr.precision < 0) {
-                            formatAttr.precision = 6;
+                            formatAttr.precision = 6; /* securec float default precision 6 */
                         } else if (formatAttr.precision == 0 && ch == SECUREC_CHAR('g')) {
                             formatAttr.precision = 1;
                         }
@@ -954,20 +954,20 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                         formatAttr.precision = 0;
 #endif
                         formatAttr.flags |= SECUREC_FLAG_ALTERNATE; /* "0x" is not default prefix in UNIX */
-                        digits = itoaLowerDigits;
+                        digits = ITOA_LOWER_DIGITS;
                         goto OUTPUT_HEX;
 #else
                                                                /* not linux vxwoks */
 #if defined(_AIX) || defined(SECUREC_ON_SOLARIS)
                         formatAttr.precision = 1;
 #else
-                        formatAttr.precision = 2 * sizeof(void *);
+                        formatAttr.precision = 2 * sizeof(void *);   /* 2 x byte number is the length of hex */
 #endif
 
 #endif
 
 #if defined(SECUREC_ON_UNIX)
-                        digits = itoaLowerDigits;
+                        digits = ITOA_LOWER_DIGITS;
                         goto OUTPUT_HEX;
 #endif
 
@@ -975,19 +975,19 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                         /* FALLTHRU */
                     case SECUREC_CHAR('X'):
                         /* unsigned upper hex output */
-                        digits = itoaUpperDigits;
+                        digits = ITOA_UPPER_DIGITS;
                         goto OUTPUT_HEX;
 
                     case SECUREC_CHAR('x'):
                         /* unsigned lower hex output */
-                        digits = itoaLowerDigits;
+                        digits = ITOA_LOWER_DIGITS;
 
                     OUTPUT_HEX:
-                        radix = 16;
+                        radix = 16; /* The radix number of 'x' or 'X' is 16 */
                         if (formatAttr.flags & SECUREC_FLAG_ALTERNATE) {
                             /* alternate form means '0x' prefix */
                             prefix[0] = SECUREC_CHAR('0');
-                            prefix[1] = (SecChar)(digits[16]); /* 'x' or 'X' */
+                            prefix[1] = (SecChar)(digits[16]); /* The serial number of 'x' or 'X' is 16 */
 
 #if (defined(SECUREC_COMPATIBLE_LINUX_FORMAT) || defined(SECUREC_VXWORKS_PLATFORM))
                             if (ch == 'p') {
@@ -998,10 +998,10 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                             if (ch == 'p') {
                                 prefixLen = 0;
                             } else {
-                                prefixLen = 2;
+                                prefixLen = 2; /* securec prefix len is 2 */
                             }
 #else
-                            prefixLen = 2;
+                            prefixLen = 2; /* securec prefix len is 2 */
 #endif
                         }
                         goto OUTPUT_INT;
@@ -1012,11 +1012,11 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                         /* fall-through */
                         /* FALLTHRU */
                     case SECUREC_CHAR('u'):
-                        radix = 10;
+                        radix = 10; /* The radix number of 'u' is 10 */
                         goto OUTPUT_INT;
                     case SECUREC_CHAR('o'):
                         /* unsigned octal output */
-                        radix = 8;
+                        radix = 8; /* The radix number of 'o' is 8 */
                         if (formatAttr.flags & SECUREC_FLAG_ALTERNATE) {
                             /* alternate form means force a leading 0 */
                             formatAttr.flags |= SECUREC_FLAG_FORCE_OCTAL;
@@ -1045,7 +1045,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                             if (formatAttr.flags & SECUREC_FLAG_CHAR) {
                             if (formatAttr.flags & SECUREC_FLAG_SIGNED) {
                                 l = (char)va_arg(arglist, int); /* sign extend */
-                                if (l >= 128) {                 /* on some platform, char is always unsigned */
+                                if (l >= 128) {                 /* 128 on some platform, char is always unsigned */
                                     SecUnsignedInt64 tmpL = (SecUnsignedInt64)l;
                                     formatAttr.flags |= SECUREC_FLAG_NEGATIVE;
                                     tch = (unsigned char)(~(tmpL));
@@ -1176,19 +1176,19 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                                     SECUREC_SPECIAL(n32Tmp, 10);
                                     break;
 #else
-                                    case 10: {
+                                    case 10: { /* securec radix decimal is 10 */
                                         /* fast div 10 */
                                         SecUnsignedInt32 q;
                                         SecUnsignedInt32 r;
                                         do {
-                                            *--formatBuf.str = digits[n32Tmp % 10];
-                                            q = (n32Tmp >> 1) + (n32Tmp >> 2);
-                                            q = q + (q >> 4);
-                                            q = q + (q >> 8);
-                                            q = q + (q >> 16);
-                                            q = q >> 3;
+                                            *--formatBuf.str = digits[n32Tmp % 10]; /* securec radix decimal is 10 */
+                                            q = (n32Tmp >> 1) + (n32Tmp >> 2); /* Fast div  magic 2 */
+                                            q = q + (q >> 4); /* Fast div  magic 4 */
+                                            q = q + (q >> 8); /* Fast div  magic 8 */
+                                            q = q + (q >> 16); /* Fast div  magic 16 */
+                                            q = q >> 3; /* Fast div  magic 3 */
                                             r = n32Tmp - (((q << 2) + q) << 1);
-                                            n32Tmp = (r > 9) ? (q + 1) : q;
+                                            n32Tmp = (r > 9) ? (q + 1) : q; /* Fast div  magic 9 */
                                         } while (n32Tmp != 0);
                                     } break;
 #endif
@@ -1199,7 +1199,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                                 /* the value to be converted is greater than 4G */
 #if defined(SECUREC_VXWORKS_VERSION_5_4)
                                 do {
-                                    if (0 != SecU64Div32((SecUnsignedInt32)((number >> 16) >> 16),
+                                    if (0 != SecU64Div32((SecUnsignedInt32)((number >> 16) >> 16), /* 16, High 32 bit mask */
                                         (SecUnsignedInt32)number, (SecUnsignedInt32)radix, &quotientHigh, &quotientLow,
                                         &digit)) {
                                         noOutput = 1;
@@ -1208,7 +1208,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                                     *--formatBuf.str = digits[digit];
 
                                     number = (SecUnsignedInt64)quotientHigh;
-                                    number = (number << 32) + quotientLow;
+                                    number = (number << 32) + quotientLow; /* High 32 bit mask */
                                 } while (number != 0);
 #else
                                 switch (radix) {
@@ -1241,7 +1241,8 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                             *--formatBuf.str = '0';
                             ++textLen; /* add a zero */
                         }
-                    } break;
+                    }
+                    break;
                     default:
                         break;
                 }
@@ -1273,7 +1274,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                         *formatBuf.str-- = 'i';
                         *formatBuf.str-- = 'n';
                         *formatBuf.str = '(';
-                        textLen = 5;
+                        textLen = 5; /* Length of (nil) is 5 */
                     }
 #endif
 
@@ -1291,7 +1292,6 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                             SECUREC_WRITE_MULTI_CHAR(SECUREC_CHAR(' '), padding, stream, &charsOut);
                         }
                     }
-
 
                     /* write prefix */
                     if (prefixLen > 0) {

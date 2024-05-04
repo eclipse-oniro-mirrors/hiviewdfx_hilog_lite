@@ -207,7 +207,7 @@ void HiLogFlush(boolean syncFlag);
  * Definitions for function Pointer.
  * @param data HiLogContent pointer.
  * @param len log data length.
- * @return function handle result. If TRUE is returned, the platform does not process, 
+ * @return function handle result. If TRUE is returned, the platform does not process,
  *         else the platform continues to process.
  */
 typedef boolean (*HilogProc)(const HiLogContent *hilogContent, uint32 len);
@@ -251,7 +251,7 @@ void HiLogFileAddWatcher(FileProc func, const char *dest);
 
 /**
  * Remove monitoring of hilog file.
- * 
+ *
  * @param func callback function.
  **/
 void HiLogFileRemoveWatcher(FileProc func);
