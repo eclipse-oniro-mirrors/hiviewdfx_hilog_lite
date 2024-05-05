@@ -30,6 +30,7 @@
 
 #define SINGLE_FMT_MAX_LEN      8
 #define FMT_CONVERT_TRMINATOR   2
+#define INI_CONVERT_DIVID_NUM 10
 
 static char g_logLevelInfo[HILOG_LV_MAX] = {
     'N', // "NONE"
@@ -150,7 +151,6 @@ void OutputLog(const uint8 *data, uint32 len)
     boolean isDisablePrintLimited = FALSE;
 #endif
     boolean isLogLimited = LogIsLimited(hiLogContent->commonContent.module);
-
     if (!isDisablePrintLimited && isLogLimited) {
         // The console output adopts the same restriction strategy as the file output,
         // and the log output to the file is restricted.
@@ -530,7 +530,7 @@ static int32 IntAppendStr(char* str, int32 num, char end)
     }
     int32 temp = num > 0 ? num : -num;
     while (temp > 0) {
-        temp /= 10;
+        temp /= INI_CONVERT_DIVID_NUM;
         digits++;
     }
     if (num < 0) {
@@ -541,8 +541,8 @@ static int32 IntAppendStr(char* str, int32 num, char end)
         temp = num;
     }
     for (int32 i = digits - 1; i >= 0; i--) {
-        str[i] = temp % 10 + '0';
-        temp /= 10;
+        str[i] = temp % INI_CONVERT_DIVID_NUM + '0';
+        temp /= INI_CONVERT_DIVID_NUM;
     }
     str[digits] = end;
     if (num < 0) {
@@ -562,13 +562,13 @@ static int UIntAppendStr(char* str, uint32 num, char end)
     }
     uint32 temp = num;
     while (temp > 0) {
-        temp /= 10;
+        temp /= INI_CONVERT_DIVID_NUM;
         digits++;
     }
     temp = num;
     for (int32 i = digits - 1; i >= 0; i--) {
-        str[i] = temp % 10 + '0';
-        temp /= 10;
+        str[i] = temp % INI_CONVERT_DIVID_NUM + '0';
+        temp /= INI_CONVERT_DIVID_NUM;
     }
     str[digits] = end;
     return digits + 1;
