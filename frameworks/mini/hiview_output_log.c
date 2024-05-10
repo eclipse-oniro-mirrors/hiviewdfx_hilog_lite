@@ -475,39 +475,67 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
 static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)
 {
     int32 ret = 0;
+    const char *fmt = logContentPtr->commonContent.fmt;
+    if (fmt == NULL) {
+        return -1;
+    }
+    char buffer[strlen(fmt)];
+    char temp[strlen(fmt)];
+    char *q;
+    char *p;
+
+    strncpy_s(buffer, strlen(fmt) + 1, fmt, strlen(fmt));
+    const char *convertFmt = buffer;
+ 
+    while ((p = strstr(convertFmt, "%{public}")) != NULL) {
+        strncpy_s(temp, sizeof(temp), convertFmt, p - convertFmt);
+        temp[p - convertFmt] = '\0';
+        strcat(temp, "%");
+        strcat(temp, p + strlen("%{public}"));
+        strncpy_s(convertFmt, sizeof(temp), temp, strlen(temp));
+    }
+ 
+    while ((q = strstr(convertFmt, "%{private}")) != NULL) {
+        strncpy_s(temp, sizeof(temp), convertFmt, q - convertFmt);
+        temp[q - convertFmt] = '\0';
+        strcat(temp, "%");
+        strcat(temp, q + strlen("%{private}"));
+        strncpy_s(convertFmt, sizeof(temp), temp, strlen(temp));
+    }
+
     switch (logContentPtr->commonContent.valueNumber) {
         case LOG_MULTI_PARA_0:
-            ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
+            ret = strncpy_s(desStrPtr, desLen, convertFmt, desLen - 1);
             if (ret != EOK) {
                 ret = -1;
             } else {
-                ret = strlen(logContentPtr->commonContent.fmt);
+                ret = strlen(convertFmt);
             }
             break;
         case LOG_MULTI_PARA_1:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0]);
             break;
         case LOG_MULTI_PARA_2:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0], logContentPtr->values[1]);
             break;
         case LOG_MULTI_PARA_3:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2]);
             break;
         case LOG_MULTI_PARA_4:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3]);
             break;
         case LOG_MULTI_PARA_5:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4]);
             break;
         case LOG_MULTI_PARA_MAX:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4],
                 logContentPtr->values[LOG_MULTI_PARA_5]);
