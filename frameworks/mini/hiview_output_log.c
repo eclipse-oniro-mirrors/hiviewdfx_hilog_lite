@@ -544,7 +544,7 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
             break;
     }
 
-    return (ret < 0) ? 0 : ret;
+    return (ret < 0) ? (desLen - 1) : ret;
 }
 
 static int32 IntAppendStr(char* str, int32 num, char end)
