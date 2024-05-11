@@ -472,70 +472,74 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
     return outLen;
 }
 
+static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen) {
+    const char *publicStr = "{public}";
+    const char *privateStr = "{private}";
+    static const int PUBLIC_LEN = 8;
+    static const int PRIVATE_LEN = 9;
+    size_t writePos = 0;
+    size_t pos = 0;
+    for (; pos < fmtLen; ++pos) {
+        arr[writePos++] = fmtStr[pos];
+        if (fmtStr[pos] != '%') {
+            continue;
+        }
+        if (pos + 1 + PUBLIC_LEN < fmtLen && strncmp(fmtStr + pos + 1, publicStr, PUBLIC_LEN) == 0) {
+            pos += PUBLIC_LEN;
+        } else if (pos + 1 + PRIVATE_LEN < fmtLen && strncmp(fmtStr + pos + 1, privateStr, PRIVATE_LEN) == 0) {
+            pos += PRIVATE_LEN;
+        }
+    }
+    while (pos < fmtLen) {
+        arr[writePos++] = fmtStr[pos];
+    }
+    arr[writePos] = 0;
+    return;
+}
+
 static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)
 {
     int32 ret = 0;
-    const char *fmt = logContentPtr->commonContent.fmt;
+    size_t fmtLen = strlen(logContentPtr->commonContent.fmt);
+    char *fmt = (char *)malloc(fmtLen * sizeof(char));
     if (fmt == NULL) {
         return -1;
     }
-    char buffer[strlen(fmt)];
-    char temp[strlen(fmt)];
-    char *q;
-    char *p;
-
-    strncpy_s(buffer, strlen(fmt) + 1, fmt, strlen(fmt));
-    const char *convertFmt = buffer;
- 
-    while ((p = strstr(convertFmt, "%{public}")) != NULL) {
-        strncpy_s(temp, sizeof(temp), convertFmt, p - convertFmt);
-        temp[p - convertFmt] = '\0';
-        strcat(temp, "%");
-        strcat(temp, p + strlen("%{public}"));
-        strncpy_s(convertFmt, sizeof(temp), temp, strlen(temp));
-    }
- 
-    while ((q = strstr(convertFmt, "%{private}")) != NULL) {
-        strncpy_s(temp, sizeof(temp), convertFmt, q - convertFmt);
-        temp[q - convertFmt] = '\0';
-        strcat(temp, "%");
-        strcat(temp, q + strlen("%{private}"));
-        strncpy_s(convertFmt, sizeof(temp), temp, strlen(temp));
-    }
-
+    memset_s(fmt, fmtLen, 0, fmtLen);
+    RemovePrivacyFmt(logContentPtr->commonContent.fmt, fmtLen, fmt, fmtLen);
     switch (logContentPtr->commonContent.valueNumber) {
         case LOG_MULTI_PARA_0:
-            ret = strncpy_s(desStrPtr, desLen, convertFmt, desLen - 1);
+            ret = strncpy_s(desStrPtr, desLen, fmt, desLen - 1);
             if (ret != EOK) {
                 ret = -1;
             } else {
-                ret = strlen(convertFmt);
+                ret = strlen(fmt);
             }
             break;
         case LOG_MULTI_PARA_1:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0]);
             break;
         case LOG_MULTI_PARA_2:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1]);
             break;
         case LOG_MULTI_PARA_3:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2]);
             break;
         case LOG_MULTI_PARA_4:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3]);
             break;
         case LOG_MULTI_PARA_5:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4]);
             break;
         case LOG_MULTI_PARA_MAX:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, convertFmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4],
                 logContentPtr->values[LOG_MULTI_PARA_5]);
@@ -543,7 +547,7 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
         default:
             break;
     }
-
+    free(fmt);
     return (ret < 0) ? (desLen - 1) : ret;
 }
 
