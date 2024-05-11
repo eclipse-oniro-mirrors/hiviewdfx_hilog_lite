@@ -473,10 +473,10 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
 }
 
 static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen) {
-    const char *publicStr = "{public}";
-    const char *privateStr = "{private}";
-    static const int PUBLIC_LEN = 8;
-    static const int PRIVATE_LEN = 9;
+    static const char *publicStr = "{public}";
+    static const char *privateStr = "{private}";
+    static const int publicLen = 8;
+    static const int privateLen = 9;
     size_t writePos = 0;
     size_t pos = 0;
     for (; pos < fmtLen; ++pos) {
@@ -484,10 +484,10 @@ static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_
         if (fmtStr[pos] != '%') {
             continue;
         }
-        if (pos + 1 + PUBLIC_LEN < fmtLen && strncmp(fmtStr + pos + 1, publicStr, PUBLIC_LEN) == 0) {
-            pos += PUBLIC_LEN;
-        } else if (pos + 1 + PRIVATE_LEN < fmtLen && strncmp(fmtStr + pos + 1, privateStr, PRIVATE_LEN) == 0) {
-            pos += PRIVATE_LEN;
+        if (pos + 1 + publicLen < fmtLen && strncmp(fmtStr + pos + 1, publicStr, publicLen) == 0) {
+            pos += publicLen;
+        } else if (pos + 1 + privateLen < fmtLen && strncmp(fmtStr + pos + 1, privateStr, privateLen) == 0) {
+            pos += privateLen;
         }
     }
     while (pos < fmtLen) {
