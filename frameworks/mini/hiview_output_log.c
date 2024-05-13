@@ -472,42 +472,74 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
     return outLen;
 }
 
+static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen) {
+    static const char *publicStr = "{public}";
+    static const char *privateStr = "{private}";
+    static const int publicLen = 8;
+    static const int privateLen = 9;
+    size_t writePos = 0;
+    size_t pos = 0;
+    for (; pos < fmtLen; ++pos) {
+        arr[writePos++] = fmtStr[pos];
+        if (fmtStr[pos] != '%') {
+            continue;
+        }
+        if (pos + 1 + publicLen < fmtLen && strncmp(fmtStr + pos + 1, publicStr, publicLen) == 0) {
+            pos += publicLen;
+        } else if (pos + 1 + privateLen < fmtLen && strncmp(fmtStr + pos + 1, privateStr, privateLen) == 0) {
+            pos += privateLen;
+        }
+    }
+    while (pos < fmtLen) {
+        arr[writePos++] = fmtStr[pos];
+    }
+    arr[writePos] = 0;
+    return;
+}
+
 static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *logContentPtr)
 {
     int32 ret = 0;
+    size_t fmtLen = strlen(logContentPtr->commonContent.fmt);
+    char *fmt = (char *)malloc(fmtLen * sizeof(char));
+    if (fmt == NULL) {
+        return -1;
+    }
+    memset_s(fmt, fmtLen, 0, fmtLen);
+    RemovePrivacyFmt(logContentPtr->commonContent.fmt, fmtLen, fmt, fmtLen);
     switch (logContentPtr->commonContent.valueNumber) {
         case LOG_MULTI_PARA_0:
-            ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
+            ret = strncpy_s(desStrPtr, desLen, fmt, desLen - 1);
             if (ret != EOK) {
                 ret = -1;
             } else {
-                ret = strlen(logContentPtr->commonContent.fmt);
+                ret = strlen(fmt);
             }
             break;
         case LOG_MULTI_PARA_1:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0]);
             break;
         case LOG_MULTI_PARA_2:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1]);
             break;
         case LOG_MULTI_PARA_3:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2]);
             break;
         case LOG_MULTI_PARA_4:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3]);
             break;
         case LOG_MULTI_PARA_5:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4]);
             break;
         case LOG_MULTI_PARA_MAX:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+            ret = snprintf_s(desStrPtr, desLen, desLen - 1, fmt,
                 logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
                 logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4],
                 logContentPtr->values[LOG_MULTI_PARA_5]);
@@ -515,8 +547,8 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
         default:
             break;
     }
-
-    return (ret < 0) ? 0 : ret;
+    free(fmt);
+    return (ret < 0) ? (desLen - 1) : ret;
 }
 
 static int32 IntAppendStr(char* str, int32 num, char end)
