@@ -22,8 +22,8 @@
             "small"
         ],
         "features": ["hilog_lite_customize_implementation"],
-      "rom": "500KB",
-      "ram": "~500KB",
+        "rom": "500KB",
+        "ram": "~500KB",
         "deps": {
             "components": [
                 "ace_engine_lite",
