@@ -21,6 +21,7 @@
             "mini",
             "small"
         ],
+        "features": ["hilog_lite_customize_implementation"],
       "rom": "500KB",
       "ram": "~500KB",
         "deps": {
