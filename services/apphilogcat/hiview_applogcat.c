@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
     while (1) {
         (void)memset_s(buf, HILOG_LOGBUFFER + 1, 0, HILOG_LOGBUFFER + 1);
         ret = read(fd, buf, HILOG_LOGBUFFER);
-        if (ret < sizeof(struct HiLogEntry)) {
+        if (ret < 0 || ret < sizeof(struct HiLogEntry)) {
             continue;
         }
         struct HiLogEntry *head = (struct HiLogEntry *)buf;
