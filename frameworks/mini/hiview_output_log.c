@@ -505,7 +505,7 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
     if (fmt == NULL) {
         return -1;
     }
-    memset_s(fmt, fmtLen, 0, fmtLen);
+    memset_s(fmt, fmtLen + 1, 0, fmtLen + 1);
     RemovePrivacyFmt(logContentPtr->commonContent.fmt, fmtLen, fmt, fmtLen);
     switch (logContentPtr->commonContent.valueNumber) {
         case LOG_MULTI_PARA_0:
