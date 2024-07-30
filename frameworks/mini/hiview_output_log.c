@@ -501,7 +501,7 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
 {
     int32 ret = 0;
     size_t fmtLen = strlen(logContentPtr->commonContent.fmt);
-    char *fmt = (char *)malloc(fmtLen * sizeof(char));
+    char *fmt = (char *)malloc((fmtLen + 1) * sizeof(char)); // 1: for '\0'
     if (fmt == NULL) {
         return -1;
     }
