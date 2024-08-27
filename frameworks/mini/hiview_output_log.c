@@ -472,7 +472,8 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
     return outLen;
 }
 
-static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen) {
+static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen)
+{
     static const char *publicStr = "{public}";
     static const char *privateStr = "{private}";
     static const int publicLen = 8;
