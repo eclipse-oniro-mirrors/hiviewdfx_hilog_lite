@@ -25,6 +25,7 @@ extern "C" {
 #endif
 #endif /* End of #ifdef __cplusplus */
 
+void HiLogInit(void);
 void InitCoreLogOutput(void);
 void InitLogOutput(void);
 void ClearLogOutput(void);

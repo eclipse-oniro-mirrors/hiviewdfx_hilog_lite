@@ -14,13 +14,9 @@
 import("//build/lite/config/component/lite_component.gni")
 import("//build/lite/ndk/ndk.gni")
 declare_args() {
-  ohos_hiviewdfx_disable_privacy_feature = false
+  hilog_lite_disable_privacy_feature = false
+  hilog_lite_disable_hilog_static = false
 }
-
-hilog_sources = [
-  "hilog.cpp",
-  "hiview_log.c",
-]
 
 config("hilog_config") {
   include_dirs = [
@@ -28,7 +24,7 @@ config("hilog_config") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "//third_party/bounds_checking_function/include",
   ]
-  if (ohos_hiviewdfx_disable_privacy_feature) {
+  if (hilog_lite_disable_privacy_feature) {
     defines = [ "DISABLE_HILOG_PRIVACY" ]
   }
   if (ohos_kernel_type != "liteos_m") {
@@ -41,17 +37,28 @@ config("hilog_config") {
   }
 }
 
-lite_library("hilog_static") {
-  target_type = "static_library"
-  sources = hilog_sources
-  public_configs = [ ":hilog_config" ]
-  public_deps = [ "//third_party/bounds_checking_function:libsec_static" ]
+if (hilog_lite_disable_hilog_static) {
+  group("hilog_static") {
+  }
+} else {
+  lite_library("hilog_static") {
+    target_type = "static_library"
+    sources = [
+      "hilog.cpp",
+      "hiview_log.c",
+    ]
+    public_configs = [ ":hilog_config" ]
+    public_deps = [ "//third_party/bounds_checking_function:libsec_static" ]
+  }
 }
 
 if (ohos_kernel_type != "liteos_m") {
   lite_library("hilog_shared") {
     target_type = "shared_library"
-    sources = hilog_sources
+    sources = [
+      "hilog.cpp",
+      "hiview_log.c",
+    ]
     public_configs = [ ":hilog_config" ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
