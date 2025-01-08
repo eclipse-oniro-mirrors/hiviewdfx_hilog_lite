@@ -14,8 +14,13 @@
 import("//build/lite/config/subsystem/aafwk/path.gni")
 import("//build/lite/config/test.gni")
 
+declare_args() {
+  hilog_lite_disable_test = false
+}
+
 group("hilog_lite_test") {
-  if (ohos_build_type == "debug" && ohos_kernel_type != "liteos_m") {
+  if (ohos_build_type == "debug" && ohos_kernel_type != "liteos_m" &&
+      !hilog_lite_disable_test) {
     deps = [ ":lite_hilog_unittest" ]
   }
 }

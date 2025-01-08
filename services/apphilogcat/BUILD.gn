@@ -13,39 +13,40 @@
 
 import("//build/lite/config/component/lite_component.gni")
 declare_args() {
-  ohos_hiviewdfx_hilog_file_size = 1024000
-  enable_ohos_hiviewdfx_apphilogcat_init_release = false
-  enable_ohos_hiviewdfx_apphilogcat_init_debug = true
-  ohos_hiviewdfx_apphilogcat_log_level_release = 5
-  ohos_hiviewdfx_apphilogcat_log_level_debug = 3
+  hilog_lite_hilog_file_size = 1024000
+  hilog_lite_enable_apphilogcat_init_release = false
+  hilog_lite_enable_apphilogcat_init_debug = true
+  hilog_lite_apphilogcat_log_level_release = 5
+  hilog_lite_apphilogcat_log_level_debug = 3
   apphilogcat_on = 1
   apphilogcat_off = 0
-  enable_ohos_hiviewdfx_hilogcat_build = true
-  ohos_hiviewdfx_apphilogcat_log_dir = "/storage/data/log"
+  hilog_lite_enable_hilogcat_build = true
+  hilog_lite_apphilogcat_log_dir = "/storage/data/log"
 }
 if (ohos_kernel_type != "liteos_m") {
   config("apphilogcat_config") {
-    defines = [ "HILOG_MAX_FILELEN = $ohos_hiviewdfx_hilog_file_size" ]
+    defines = [ "HILOG_MAX_FILELEN = $hilog_lite_hilog_file_size" ]
 
-    if (enable_ohos_hiviewdfx_apphilogcat_init_release) {
+    if (hilog_lite_enable_apphilogcat_init_release) {
       defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_on" ]
     } else {
       defines += [ "APPHILOGCAT_STATUS_RELEASE = $apphilogcat_off" ]
     }
 
-    if (enable_ohos_hiviewdfx_apphilogcat_init_debug) {
+    if (hilog_lite_enable_apphilogcat_init_debug) {
       defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_on" ]
     } else {
       defines += [ "APPHILOGCAT_STATUS_DEBUG = $apphilogcat_off" ]
     }
 
-    defines += [ "CONFIG_LOG_LEVEL_RELEASE = $ohos_hiviewdfx_apphilogcat_log_level_release" ]
-
     defines += [
-      "CONFIG_LOG_LEVEL_DEBUG = $ohos_hiviewdfx_apphilogcat_log_level_debug",
+      "CONFIG_LOG_LEVEL_RELEASE = $hilog_lite_apphilogcat_log_level_release",
     ]
 
-    defines += [ "HILOG_DIR = \"$ohos_hiviewdfx_apphilogcat_log_dir\"" ]
+    defines +=
+        [ "CONFIG_LOG_LEVEL_DEBUG = $hilog_lite_apphilogcat_log_level_debug" ]
+
+    defines += [ "HILOG_DIR = \"$hilog_lite_apphilogcat_log_dir\"" ]
   }
 
   static_library("apphilogcat_static") {
@@ -58,7 +59,7 @@ if (ohos_kernel_type != "liteos_m") {
     ]
     public_configs = [ ":apphilogcat_config" ]
 
-    if (enable_ohos_hiviewdfx_hilogcat_build) {
+    if (hilog_lite_enable_hilogcat_build) {
       deps += [ "//base/hiviewdfx/hilog_lite/services/hilogcat:hilogcat" ]
     }
   }

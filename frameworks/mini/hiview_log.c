@@ -33,7 +33,7 @@ const char * const FUN_ARG_S = "0123456I";
 static boolean CheckParameters(uint8 module, uint8 level);
 
 /* The first step does not involve memory allocation. */
-static void HiLogInit(void)
+void HiLogInit(void)
 {
     HIVIEW_UartPrint("hilog will init.\n");
     InitCoreLogOutput();
@@ -62,7 +62,9 @@ static void HiLogInit(void)
     HiviewRegisterInitFunc(HIVIEW_CMP_TYPE_LOG_LIMIT, InitLogLimit);
     HILOG_DEBUG(HILOG_MODULE_HIVIEW, "hilog init success.");
 }
+#ifndef DISABLE_HILOG_LITE_CORE_INIT
 CORE_INIT_PRI(HiLogInit, 0);
+#endif
 
 static boolean CheckParameters(uint8 module, uint8 level)
 {
