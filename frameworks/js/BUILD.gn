@@ -14,7 +14,11 @@
 
 import("//build/lite/config/component/lite_component.gni")
 
-if (ohos_kernel_type != "liteos_m") {
+declare_args() {
+  hilog_lite_disable_js_feature = false
+}
+
+if (ohos_kernel_type != "liteos_m" && !hilog_lite_disable_js_feature) {
   lite_component("ace_hilog_kits") {
     features = [ "builtin:ace_kit_hilog" ]
   }

@@ -25,7 +25,8 @@ group("hilog_lite_test") {
   }
 }
 
-if (ohos_build_type == "debug" && ohos_kernel_type != "liteos_m") {
+if (ohos_build_type == "debug" && ohos_kernel_type != "liteos_m" &&
+    !hilog_lite_disable_test) {
   unittest("lite_hilog_unittest") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hilog_lite"
