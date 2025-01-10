@@ -39,7 +39,8 @@
             "hilog_lite_apphilogcat_log_level_debug",
             "hilog_lite_enable_hilogcat_build",
             "hilog_lite_apphilogcat_log_dir",
-            "hilog_lite_disable_test"
+            "hilog_lite_disable_test",
+            "hilog_lite_disable_js_feature"
         ],
         "rom": "500KB",
         "ram": "~500KB",
