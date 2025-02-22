@@ -405,7 +405,7 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
 
     time = commonContentPtr->time;
     localtime_r(&time, &nowTime);
-    month = nowTime.tm_mon + 1;
+    month = (uint32)(nowTime.tm_mon + 1);
     day = nowTime.tm_mday;
     hour = nowTime.tm_hour;
     min = nowTime.tm_min;
@@ -474,13 +474,16 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
 
 static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_t arrLen)
 {
+    if (arrLen == 0) {
+        return;
+    }
     static const char *publicStr = "{public}";
     static const char *privateStr = "{private}";
     static const int publicLen = 8;
     static const int privateLen = 9;
     size_t writePos = 0;
     size_t pos = 0;
-    for (; pos < fmtLen; ++pos) {
+    for (; pos < fmtLen && writePos < arrLen - 1; ++pos) {
         arr[writePos++] = fmtStr[pos];
         if (fmtStr[pos] != '%') {
             continue;
@@ -491,7 +494,7 @@ static void RemovePrivacyFmt(const char* fmtStr, size_t fmtLen, char* arr, size_
             pos += privateLen;
         }
     }
-    while (pos < fmtLen) {
+    while (pos < fmtLen && writePos < arrLen - 1) {
         arr[writePos++] = fmtStr[pos];
     }
     arr[writePos] = 0;
