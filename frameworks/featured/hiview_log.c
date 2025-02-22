@@ -142,7 +142,10 @@ int SecPutWcharStrEndingZero(SecPrintfStream *str, int zeroNum)
     int succeed = 0;
     int i;
 
-    for (i = 0; i < zeroNum && (SECUREC_PUTC_ZERO(str) != EOF); ++i) {
+    for (i = 0; i < zeroNum; ++i) {
+        if (SECUREC_PUTC_ZERO(str) == EOF) {
+            break;
+        }
     }
     if (i == zeroNum) {
         succeed = 1;
@@ -1414,8 +1417,10 @@ int HiLogSecVsnprintfImpl(char *string, size_t count, bool isDebugMode, const ch
     str.cur = string;
 
     retVal = HiLogSecOutputS(&str, isDebugMode, format, arglist);
-    if ((retVal >= 0) && (SECUREC_PUTC_ZERO(&str) != EOF)) {
-        return (retVal);
+    if (retVal >= 0) {
+        if (SECUREC_PUTC_ZERO(&str) != EOF) {
+            return retVal;
+        }
     } else if (str.count < 0) {
         /* the buffer was too small; we return truncation */
         string[count - 1] = 0;
