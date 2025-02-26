@@ -399,17 +399,16 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
 {
     int32 ret;
     time_t time;
-    uint32 month, day, hour, min, sec;
     uint8_t level;
     struct tm nowTime = {0};
 
     time = commonContentPtr->time;
     localtime_r(&time, &nowTime);
-    month = (uint32)(nowTime.tm_mon + 1);
-    day = nowTime.tm_mday;
-    hour = nowTime.tm_hour;
-    min = nowTime.tm_min;
-    sec = nowTime.tm_sec;
+    int month = nowTime.tm_mon + 1;
+    int day = nowTime.tm_mday;
+    int hour = nowTime.tm_hour;
+    int min = nowTime.tm_min;
+    int sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
     if (level >= HILOG_LV_MAX) {
         level = 0;
