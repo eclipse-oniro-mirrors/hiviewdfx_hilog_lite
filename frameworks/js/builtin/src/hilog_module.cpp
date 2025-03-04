@@ -52,6 +52,9 @@ void HilogModule::ParseLogContent(const HilogString *formatStr, const HilogVecto
         return;
     }
     char *format = HilogString::Get(formatStr);
+    if (format == nullptr) {
+        return;
+    }
     size_t len = HilogString::Length(formatStr);
     size_t pos = 0;
     size_t count = 0;
