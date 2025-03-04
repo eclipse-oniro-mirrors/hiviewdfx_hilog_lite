@@ -67,7 +67,7 @@ size_t HilogString::Puts(const char *src, HilogString *str, size_t strLen)
             return 0;
         }
     }
-    if (memcpy_s(str->str + str->size, str->maxSize, src, len) != 0) {
+    if (memcpy_s(str->str + str->size, str->maxSize - str->size, src, len) != 0) {
         return 0;
     }
     str->size += len;
