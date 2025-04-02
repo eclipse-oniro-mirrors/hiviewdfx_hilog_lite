@@ -1116,7 +1116,6 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
 #endif
 #endif
                             ((formatAttr.flags & SECUREC_FLAG_LONGLONG) == 0)) {
-
                             number &= 0xffffffff;
                         }
 
@@ -1142,7 +1141,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                             prefixLen = 0;
 #else
                             if ((ch == 'p') && (formatAttr.flags & SECUREC_FLAG_ALTERNATE))
-                                prefixLen = 2;
+                                prefixLen = 2; /* prefix 0x len is 2 */
                             else
                                 prefixLen = 0;
 #endif
@@ -1190,7 +1189,7 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                                             q = q + (q >> 8); /* Fast div  magic 8 */
                                             q = q + (q >> 16); /* Fast div  magic 16 */
                                             q = q >> 3; /* Fast div  magic 3 */
-                                            r = n32Tmp - (((q << 2) + q) << 1);
+                                            r = n32Tmp - (((q << 2) + q) << 1); /* Fast div  magic 2 */
                                             n32Tmp = (r > 9) ? (q + 1) : q; /* Fast div  magic 9 */
                                         } while (n32Tmp != 0);
                                     } break;
@@ -1202,7 +1201,8 @@ int HiLogSecOutputS(SecPrintfStream *stream, bool isDebugMode, const char *cform
                                 /* the value to be converted is greater than 4G */
 #if defined(SECUREC_VXWORKS_VERSION_5_4)
                                 do {
-                                    if (0 != SecU64Div32((SecUnsignedInt32)((number >> 16) >> 16), /* 16, High 32 bit mask */
+                                    /* 16, High 32 bit mask */
+                                    if (0 != SecU64Div32((SecUnsignedInt32)((number >> 16) >> 16),
                                         (SecUnsignedInt32)number, (SecUnsignedInt32)radix, &quotientHigh, &quotientLow,
                                         &digit)) {
                                         noOutput = 1;
