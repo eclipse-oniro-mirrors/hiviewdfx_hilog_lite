@@ -51,7 +51,7 @@ static int FileSize(const char *filename)
     if (ret == 0) {
         size = ftell(fp);
     }
-    fclose(fp);
+    (void)fclose(fp);
 
     return size;
 }
