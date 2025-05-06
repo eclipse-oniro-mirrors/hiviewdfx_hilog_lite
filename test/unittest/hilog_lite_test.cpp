@@ -702,11 +702,9 @@ HWTEST_F(HilogLiteTest, Test_HilogRealloc_Realloc_002, Level1)
 {
     char *ptr = static_cast<char*>(malloc(1));
     ASSERT_NE(ptr, nullptr);
-    if (ptr != nullptr) {
-        char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, 0, 0));
-        free(ptr);
-        EXPECT_TRUE(result == nullptr);
-    }
+    char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, 0, 0));
+    free(ptr);
+    EXPECT_TRUE(result == nullptr);
 }
 
 /**
@@ -720,10 +718,8 @@ HWTEST_F(HilogLiteTest, Test_HilogRealloc_Realloc_003, Level1)
 {
     char *ptr = const_cast<char*>(RELLOC_STRING);
     ASSERT_NE(ptr, nullptr);
-    if (ptr != nullptr) {
-        char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, 1, RELLOC_SIZE));
-        EXPECT_TRUE(strlen(result) == RELLOC_SIZE - 1);
-    }
+    char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, 1, RELLOC_SIZE));
+    EXPECT_TRUE(strlen(result) == RELLOC_SIZE - 1);
 }
 
 /**
@@ -737,13 +733,11 @@ HWTEST_F(HilogLiteTest, Test_HilogRealloc_Realloc_004, Level1)
 {
     char *ptr = static_cast<char*>(malloc(RELLOC_SIZE - 1));
     ASSERT_NE(ptr, nullptr);
-    if (ptr != nullptr) {
-        size_t size = malloc_usable_size(ptr);
-        char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, RELLOC_SIZE, RELLOC_SIZE - 1));
-        free(result);
-        EXPECT_TRUE(malloc_usable_size(result) >= RELLOC_SIZE);
-        EXPECT_TRUE(malloc_usable_size(result) >= size);
-    }
+    size_t size = malloc_usable_size(ptr);
+    char *result = static_cast<char*>(ACELite::HilogRealloc::Realloc(ptr, RELLOC_SIZE, RELLOC_SIZE - 1));
+    free(result);
+    EXPECT_TRUE(malloc_usable_size(result) >= RELLOC_SIZE);
+    EXPECT_TRUE(malloc_usable_size(result) >= size);
 }
 }  // namespace ACELite
 }  // namespace OHOS
