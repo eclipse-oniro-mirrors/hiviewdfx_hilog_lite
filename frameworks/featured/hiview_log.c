@@ -19,6 +19,7 @@
 #include "fcntl.h"
 #include "unistd.h"
 #include <log.h>
+#pragma GCC diagnostic ignored "-Watomic-alignment"
 
 #ifndef LOSCFG_BASE_CORE_HILOG
 #include <stdatomic.h>
