@@ -33,7 +33,6 @@ config("hilog_config") {
       "-fno-common",
       "-fno-strict-aliasing",
       "-O2",
-      "-Wno-atomic-alignment",
     ]
   }
 }

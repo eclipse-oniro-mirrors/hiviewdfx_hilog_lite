@@ -20,6 +20,13 @@
 #include "unistd.h"
 #include <log.h>
 
+#ifdef __IAR_SYSTEMS_ICC__
+// IAR-specific code to ignore the warning
+#pragma diag_suppress=Pe161
+#else
+#pragma GCC diagnostic ignored "-Watomic-alignment"
+#endif
+
 #ifndef LOSCFG_BASE_CORE_HILOG
 #include <stdatomic.h>
 #include "hilog_trace.h"
