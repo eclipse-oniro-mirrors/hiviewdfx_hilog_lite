@@ -76,6 +76,7 @@ static_library("hilog_lite_static") {
 }
 
 group("hilog_lite") {
+  check_flag = false
   if (ohos_kernel_type == "liteos_m") {
     if (hilog_lite_customize_implementation) {
       public_configs = [
